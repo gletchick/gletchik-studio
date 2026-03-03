@@ -12,6 +12,7 @@ find_package(Qt5 COMPONENTS Core Gui Widgets REQUIRED)
 
 add_executable(gletchik-studio
         main.cpp
+        resources/resources.qrc
 )
 
 target_include_directories(gletchik-studio PUBLIC include)

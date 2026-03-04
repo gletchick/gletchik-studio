@@ -22,3 +22,7 @@ target_link_libraries(gletchik-studio
         Qt5::Gui
         Qt5::Widgets
 )
+
+list(APPEND SOURCES "src/core/windows/MainWindow.cpp")
+list(APPEND HEADERS "include/core/windows/mainwindow.h")
+list(APPEND FORMS "src/ui/windows/MainWindow.ui")

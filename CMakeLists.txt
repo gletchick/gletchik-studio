@@ -10,6 +10,8 @@ set(CMAKE_AUTORCC ON)
 
 find_package(Qt5 COMPONENTS Core Gui Widgets REQUIRED)
 
+set(CMAKE_AUTOUIC_SEARCH_PATHS src/ui/windows)
+
 add_executable(gletchik-studio
         main.cpp
         resources/resources.qrc
@@ -22,7 +24,3 @@ target_link_libraries(gletchik-studio
         Qt5::Gui
         Qt5::Widgets
 )
-
-list(APPEND SOURCES "src/core/windows/MainWindow.cpp")
-list(APPEND HEADERS "include/core/windows/mainwindow.h")
-list(APPEND FORMS "src/ui/windows/MainWindow.ui")

@@ -1,0 +1,11 @@
+# CLion и CMake
+cmake-build-debug/
+cmake-build-release/
+.idea/
+
+# Python (если есть .venv)
+.venv/
+__pycache__/
+
+# Локальные конфиги
+*.user

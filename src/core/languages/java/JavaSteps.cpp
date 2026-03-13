@@ -3,11 +3,11 @@
 namespace gs {
 
     std::vector<std::string> JavaCompileStep::getArguments() const {
-        return { "-d", ".", "./../Main.java" };
+        return { "-d", ".", m_sourceFilePath };
     }
 
     std::vector<std::string> JavaRunStep::getArguments() const {
-        return { "-cp", ".", "Main" };
+        return { "-cp", ".", m_className };
     }
 
 } // namespace gs

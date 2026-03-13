@@ -27,6 +27,11 @@ set(CORE_SOURCES
         src/core/execution/StepRunner.cpp
         src/core/languages/java/JavaSteps.cpp
         src/core/languages/java/JavaLanguageProvider.cpp
+        include/core/execution/IBuildController.h
+        include/core/execution/AbstractBuildController.h
+        src/core/execution/AbstractBuildController.cpp
+        include/core/languages/java/JavaBuildController.h
+        src/core/languages/java/JavaBuildController.cpp
 )
 
 add_executable(gletchik-studio

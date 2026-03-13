@@ -15,6 +15,9 @@ set(CMAKE_AUTOUIC_SEARCH_PATHS src/ui/windows)
 add_executable(gletchik-studio
         main.cpp
         resources/resources.qrc
+        include/core/execution/IBuildStep.h
+        include/core/processes/IProcess.h
+        include/core/execution/IStepRunner.h
 )
 
 target_include_directories(gletchik-studio PUBLIC include)

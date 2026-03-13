@@ -3,7 +3,7 @@
 #include <vector>
 
 #include "IBuildStep.h"
-#include "core/processes/StepType.h"
+#include "../StepType.h"
 
 namespace gs {
 

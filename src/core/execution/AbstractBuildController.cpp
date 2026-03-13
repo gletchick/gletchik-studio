@@ -6,12 +6,12 @@
 namespace gs {
 
     AbstractBuildController::AbstractBuildController() {
-        m_process = std::make_shared<nativeprocess>();
+        m_process = std::make_shared<NativeProcess>();
     }
 
     bool AbstractBuildController::runProject(const std::string& projectPath, 
                                              const std::string& sourceFilePath, 
-                                             steptype untilStep) {
+                                             StepType untilStep) {
         auto provider = createProvider(m_process);
 
         if (!provider) {
@@ -32,6 +32,12 @@ namespace gs {
         
         if (m_process) {
             m_process->kill();
+        }
+    }
+
+    void AbstractBuildController::writeInput(const std::string& input) {
+        if (m_process && m_process->isRunning()) {
+            m_process->writeToStdin(input);
         }
     }
 

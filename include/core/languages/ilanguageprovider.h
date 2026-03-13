@@ -7,11 +7,11 @@
 
 namespace gs {
 
-    class ilanguageprovider {
+    class ILanguageProvider {
     public:
-        virtual ~ilanguageprovider() = default;
+        virtual ~ILanguageProvider() = default;
         virtual std::string languageName() const = 0;
-        virtual std::vector<std::shared_ptr<ibuildstep>> getBuildPipeline(
+        virtual std::vector<std::shared_ptr<IBuildStep>> getBuildPipeline(
             const std::string& projectPath,
             const std::string& sourceFilePath) = 0;
     };

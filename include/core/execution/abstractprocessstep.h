@@ -8,10 +8,10 @@
 
 namespace gs {
 
-    class abstractprocessstep : public ibuildstep {
+    class AbstractProcessStep : public IBuildStep {
     public:
-        explicit abstractprocessstep(std::shared_ptr<iprocess> process);
-        virtual ~abstractprocessstep() = default;
+        explicit AbstractProcessStep(std::shared_ptr<IProcess> process);
+        virtual ~AbstractProcessStep() = default;
 
         bool execute() override;
 
@@ -19,7 +19,7 @@ namespace gs {
         virtual std::string getCommand() const = 0;
         virtual std::vector<std::string> getArguments() const = 0;
 
-        std::shared_ptr<iprocess> m_process;
+        std::shared_ptr<IProcess> m_process;
     };
 
 } // namespace gs

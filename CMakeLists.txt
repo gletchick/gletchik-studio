@@ -22,17 +22,17 @@ set(CORE_SOURCES
         include/core/languages/ilanguageprovider.h
 
         # Implementation
-        src/core/processes/nativeprocess.cpp
-        src/core/execution/abstractprocessstep.cpp
-        src/core/execution/steprunner.cpp
-        src/core/languages/java/javasteps.cpp
-        src/core/languages/java/javalanguageprovider.cpp
+        src/core/processes/NativeProcess.cpp
+        src/core/execution/AbstractProcessStep.cpp
+        src/core/execution/StepRunner.cpp
+        src/core/languages/java/JavaSteps.cpp
+        src/core/languages/java/JavaLanguageProvider.cpp
         include/core/execution/ibuildcontroller.h
         include/core/execution/abstractbuildcontroller.h
         src/core/execution/AbstractBuildController.cpp
         include/core/languages/java/javabuildbontroller.h
         src/core/languages/java/JavaBuildController.cpp
-        src/ui/JavaParser.cpp
+        src/core/utils/JavaParser.cpp
         include/core/utils/javaparser.h
 )
 

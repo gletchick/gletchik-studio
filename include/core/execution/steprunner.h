@@ -4,19 +4,19 @@
 
 namespace gs {
 
-    class steprunner : public isteprunner {
+    class StepRunner : public IStepRunner {
     public:
-        steprunner() = default;
-        ~steprunner() override = default;
+        StepRunner() = default;
+        ~StepRunner() override = default;
 
-        void setSteps(std::vector<std::shared_ptr<ibuildstep>> steps) override;
+        void setSteps(std::vector<std::shared_ptr<IBuildStep>> steps) override;
 
-        bool runUntil(steptype type) override;
+        bool runUntil(StepType type) override;
 
         void stop() override;
 
     private:
-        std::vector<std::shared_ptr<ibuildstep>> m_steps;
+        std::vector<std::shared_ptr<IBuildStep>> m_steps;
         bool m_stopRequested = false;
     };
 

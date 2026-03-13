@@ -3,8 +3,8 @@
 
 namespace gs {
 
-    std::shared_ptr<ilanguageprovider> JavaBuildController::createProvider(std::shared_ptr<iprocess> process) {
-        return std::make_shared<javalanguageprovider>(process);
+    std::shared_ptr<ILanguageProvider> JavaBuildController::createProvider(std::shared_ptr<IProcess> process) {
+        return std::make_shared<JavaLanguageProvider>(process);
     }
 
 } // namespace gs

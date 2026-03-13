@@ -7,11 +7,11 @@
 
 namespace gs {
 
-    class isteprunner {
+    class IStepRunner {
     public:
-        virtual ~isteprunner() = default;
-        virtual void setSteps(std::vector<std::shared_ptr<ibuildstep>> steps) = 0;
-        virtual bool runUntil(steptype type) = 0;
+        virtual ~IStepRunner() = default;
+        virtual void setSteps(std::vector<std::shared_ptr<IBuildStep>> steps) = 0;
+        virtual bool runUntil(StepType type) = 0;
         virtual void stop() = 0;
     };
 

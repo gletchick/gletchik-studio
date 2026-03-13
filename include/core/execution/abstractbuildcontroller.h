@@ -7,22 +7,24 @@
 
 namespace gs {
 
-    class AbstractBuildController : public ibuildcontroller {
+    class AbstractBuildController : public IBuildController {
     public:
         AbstractBuildController();
         ~AbstractBuildController() override = default;
 
         bool runProject(const std::string& projectPath, 
                         const std::string& sourceFilePath, 
-                        steptype untilStep) override;
+                        StepType untilStep) override;
 
         void stop() override;
 
-    protected:
-        virtual std::shared_ptr<ilanguageprovider> createProvider(std::shared_ptr<iprocess> process) = 0;
+        void writeInput(const std::string& input) override;
 
-        std::shared_ptr<iprocess> m_process;
-        steprunner m_runner;
+    protected:
+        virtual std::shared_ptr<ILanguageProvider> createProvider(std::shared_ptr<IProcess> process) = 0;
+
+        std::shared_ptr<IProcess> m_process;
+        StepRunner m_runner;
     };
 
 } // namespace gs

@@ -4,7 +4,7 @@
 
 namespace gs {
 
-    void steprunner::setSteps(std::vector<std::shared_ptr<ibuildstep>> steps) {
+    void StepRunner::setSteps(std::vector<std::shared_ptr<IBuildStep>> steps) {
         m_steps = std::move(steps);
 
         std::sort(m_steps.begin(), m_steps.end(), [](const auto& a, const auto& b) {
@@ -12,7 +12,7 @@ namespace gs {
         });
     }
 
-    bool steprunner::runUntil(steptype type) {
+    bool StepRunner::runUntil(StepType type) {
         m_stopRequested = false;
 
         for (const auto& step : m_steps) {
@@ -28,7 +28,7 @@ namespace gs {
         return !m_stopRequested;
     }
 
-    void steprunner::stop() {
+    void StepRunner::stop() {
         m_stopRequested = true;
     }
 

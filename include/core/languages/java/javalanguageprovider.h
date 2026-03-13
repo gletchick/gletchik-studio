@@ -5,19 +5,19 @@
 
 namespace gs {
 
-    class javalanguageprovider : public ilanguageprovider {
+    class JavaLanguageProvider : public ILanguageProvider {
     public:
-        explicit javalanguageprovider(std::shared_ptr<iprocess> process);
+        explicit JavaLanguageProvider(std::shared_ptr<IProcess> process);
 
         std::string languageName() const override;
 
 
-        std::vector<std::shared_ptr<ibuildstep>> getBuildPipeline(
+        std::vector<std::shared_ptr<IBuildStep>> getBuildPipeline(
             const std::string& projectPath,
             const std::string& className) override;
 
     private:
-        std::shared_ptr<iprocess> m_process;
+        std::shared_ptr<IProcess> m_process;
     };
 
 } // namespace gs

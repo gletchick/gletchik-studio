@@ -4,15 +4,17 @@
 
 namespace gs {
 
-    class ibuildcontroller {
+    class IBuildController {
     public:
-        virtual ~ibuildcontroller() = default;
+        virtual ~IBuildController() = default;
 
         virtual bool runProject(const std::string& projectPath,
                                 const std::string& sourceFilePath, 
-                                steptype untilStep) = 0;
+                                StepType untilStep) = 0;
 
         virtual void stop() = 0;
+        virtual void writeInput(const std::string& input) = 0;
+
     };
 
 } // namespace gs

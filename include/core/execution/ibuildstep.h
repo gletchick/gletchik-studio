@@ -4,11 +4,11 @@
 
 namespace gs {
 
-    class ibuildstep {
+    class IBuildStep {
     public:
-        virtual ~ibuildstep() = default;
+        virtual ~IBuildStep() = default;
         virtual std::string name() const = 0;
-        virtual steptype type() const = 0;
+        virtual StepType type() const = 0;
         virtual bool execute() = 0;
     };
 

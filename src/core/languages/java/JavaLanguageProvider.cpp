@@ -10,18 +10,18 @@ namespace fs = std::filesystem;
 
 namespace gs {
 
-    javalanguageprovider::javalanguageprovider(std::shared_ptr<iprocess> process)
+    JavaLanguageProvider::JavaLanguageProvider(std::shared_ptr<IProcess> process)
         : m_process(std::move(process)) {}
 
-    std::string javalanguageprovider::languageName() const {
+    std::string JavaLanguageProvider::languageName() const {
         return "Java";
     }
 
-    std::vector<std::shared_ptr<ibuildstep>> javalanguageprovider::getBuildPipeline(
+    std::vector<std::shared_ptr<IBuildStep>> JavaLanguageProvider::getBuildPipeline(
     const std::string& projectPath,
     const std::string& sourceFilePath) {
 
-        std::vector<std::shared_ptr<ibuildstep>> pipeline;
+        std::vector<std::shared_ptr<IBuildStep>> pipeline;
 
         std::vector<std::string> allSources;
         try {

@@ -4,9 +4,9 @@
 
 namespace gs {
 
-    class IProcess {
+    class iprocess {
     public:
-        virtual ~IProcess() = default;
+        virtual ~iprocess() = default;
         virtual bool start(const std::string& command, const std::vector<std::string>& args) = 0;
         virtual void kill() = 0;
         virtual bool isRunning() const = 0;

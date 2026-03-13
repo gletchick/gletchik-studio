@@ -1,27 +1,27 @@
-#include "core/languages/java/JavaLanguageProvider.h"
+#include "core/languages/java/javalanguageprovider.h"
 
 #include <filesystem>
 #include <iostream>
 
-#include "core/languages/java/JavaSteps.h"
-#include "../../../../include/core/utils/JavaParser.h"
+#include "core/languages/java/javasteps.h"
+#include "../../../../include/core/utils/javaparser.h"
 
 namespace fs = std::filesystem;
 
 namespace gs {
 
-    JavaLanguageProvider::JavaLanguageProvider(std::shared_ptr<IProcess> process)
+    javalanguageprovider::javalanguageprovider(std::shared_ptr<iprocess> process)
         : m_process(std::move(process)) {}
 
-    std::string JavaLanguageProvider::languageName() const {
+    std::string javalanguageprovider::languageName() const {
         return "Java";
     }
 
-    std::vector<std::shared_ptr<IBuildStep>> JavaLanguageProvider::getBuildPipeline(
+    std::vector<std::shared_ptr<ibuildstep>> javalanguageprovider::getBuildPipeline(
     const std::string& projectPath,
     const std::string& sourceFilePath) {
 
-        std::vector<std::shared_ptr<IBuildStep>> pipeline;
+        std::vector<std::shared_ptr<ibuildstep>> pipeline;
 
         std::vector<std::string> allSources;
         try {

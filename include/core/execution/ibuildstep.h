@@ -1,14 +1,14 @@
 #pragma once
 #include <string>
-#include "../StepType.h"
+#include "../steptype.h"
 
 namespace gs {
 
-    class IBuildStep {
+    class ibuildstep {
     public:
-        virtual ~IBuildStep() = default;
+        virtual ~ibuildstep() = default;
         virtual std::string name() const = 0;
-        virtual StepType type() const = 0;
+        virtual steptype type() const = 0;
         virtual bool execute() = 0;
     };
 

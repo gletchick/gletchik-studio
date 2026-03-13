@@ -1,17 +1,17 @@
-#include "core/execution/AbstractBuildController.h"
+#include "core/execution/abstractbuildcontroller.h"
 
-#include "core/processes/NativeProcess.h"
+#include "core/processes/nativeprocess.h"
 #include <iostream>
 
 namespace gs {
 
     AbstractBuildController::AbstractBuildController() {
-        m_process = std::make_shared<NativeProcess>();
+        m_process = std::make_shared<nativeprocess>();
     }
 
     bool AbstractBuildController::runProject(const std::string& projectPath, 
                                              const std::string& sourceFilePath, 
-                                             StepType untilStep) {
+                                             steptype untilStep) {
         auto provider = createProvider(m_process);
 
         if (!provider) {

@@ -3,15 +3,15 @@
 #include <vector>
 #include <string>
 
-#include "core/execution/IBuildStep.h"
+#include "core/execution/ibuildstep.h"
 
 namespace gs {
 
-    class ILanguageProvider {
+    class ilanguageprovider {
     public:
-        virtual ~ILanguageProvider() = default;
+        virtual ~ilanguageprovider() = default;
         virtual std::string languageName() const = 0;
-        virtual std::vector<std::shared_ptr<IBuildStep>> getBuildPipeline(
+        virtual std::vector<std::shared_ptr<ibuildstep>> getBuildPipeline(
             const std::string& projectPath,
             const std::string& sourceFilePath) = 0;
     };

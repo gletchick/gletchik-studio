@@ -15,25 +15,25 @@ set(CMAKE_AUTOUIC_SEARCH_PATHS src/ui/windows)
 # Группируем файлы для удобства
 set(CORE_SOURCES
         # Interfaces
-        include/core/StepType.h
-        include/core/processes/IProcess.h
-        include/core/execution/IBuildStep.h
-        include/core/execution/IStepRunner.h
-        include/core/languages/ILanguageProvider.h
+        include/core/steptype.h
+        include/core/processes/iprocess.h
+        include/core/execution/ibuildstep.h
+        include/core/execution/isteprunner.h
+        include/core/languages/ilanguageprovider.h
 
         # Implementation
-        src/core/processes/NativeProcess.cpp
-        src/core/execution/AbstractProcessStep.cpp
-        src/core/execution/StepRunner.cpp
-        src/core/languages/java/JavaSteps.cpp
-        src/core/languages/java/JavaLanguageProvider.cpp
-        include/core/execution/IBuildController.h
-        include/core/execution/AbstractBuildController.h
+        src/core/processes/nativeprocess.cpp
+        src/core/execution/abstractprocessstep.cpp
+        src/core/execution/steprunner.cpp
+        src/core/languages/java/javasteps.cpp
+        src/core/languages/java/javalanguageprovider.cpp
+        include/core/execution/ibuildcontroller.h
+        include/core/execution/abstractbuildcontroller.h
         src/core/execution/AbstractBuildController.cpp
-        include/core/languages/java/JavaBuildController.h
+        include/core/languages/java/javabuildbontroller.h
         src/core/languages/java/JavaBuildController.cpp
         src/ui/JavaParser.cpp
-        include/core/utils/JavaParser.h
+        include/core/utils/javaparser.h
 )
 
 add_executable(gletchik-studio

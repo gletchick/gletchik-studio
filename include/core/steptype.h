@@ -2,7 +2,7 @@
 
 namespace gs {
 
-    enum class StepType {
+    enum class steptype {
         Clean,
         Fetch,
         Compile,

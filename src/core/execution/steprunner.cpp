@@ -1,10 +1,10 @@
-#include "core/execution/StepRunner.h"
+#include "core/execution/steprunner.h"
 #include <iostream>
 #include <algorithm>
 
 namespace gs {
 
-    void StepRunner::setSteps(std::vector<std::shared_ptr<IBuildStep>> steps) {
+    void steprunner::setSteps(std::vector<std::shared_ptr<ibuildstep>> steps) {
         m_steps = std::move(steps);
 
         std::sort(m_steps.begin(), m_steps.end(), [](const auto& a, const auto& b) {
@@ -12,7 +12,7 @@ namespace gs {
         });
     }
 
-    bool StepRunner::runUntil(StepType type) {
+    bool steprunner::runUntil(steptype type) {
         m_stopRequested = false;
 
         for (const auto& step : m_steps) {
@@ -28,7 +28,7 @@ namespace gs {
         return !m_stopRequested;
     }
 
-    void StepRunner::stop() {
+    void steprunner::stop() {
         m_stopRequested = true;
     }
 

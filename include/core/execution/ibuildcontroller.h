@@ -1,16 +1,16 @@
 #pragma once
 #include <string>
-#include "core/StepType.h"
+#include "core/steptype.h"
 
 namespace gs {
 
-    class IBuildController {
+    class ibuildcontroller {
     public:
-        virtual ~IBuildController() = default;
+        virtual ~ibuildcontroller() = default;
 
         virtual bool runProject(const std::string& projectPath,
                                 const std::string& sourceFilePath, 
-                                StepType untilStep) = 0;
+                                steptype untilStep) = 0;
 
         virtual void stop() = 0;
     };

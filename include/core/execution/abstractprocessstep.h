@@ -3,15 +3,15 @@
 #include <string>
 #include <vector>
 
-#include "IBuildStep.h"
-#include "core/processes/IProcess.h"
+#include "ibuildstep.h"
+#include "core/processes/iprocess.h"
 
 namespace gs {
 
-    class AbstractProcessStep : public IBuildStep {
+    class abstractprocessstep : public ibuildstep {
     public:
-        explicit AbstractProcessStep(std::shared_ptr<IProcess> process);
-        virtual ~AbstractProcessStep() = default;
+        explicit abstractprocessstep(std::shared_ptr<iprocess> process);
+        virtual ~abstractprocessstep() = default;
 
         bool execute() override;
 
@@ -19,7 +19,7 @@ namespace gs {
         virtual std::string getCommand() const = 0;
         virtual std::vector<std::string> getArguments() const = 0;
 
-        std::shared_ptr<IProcess> m_process;
+        std::shared_ptr<iprocess> m_process;
     };
 
 } // namespace gs

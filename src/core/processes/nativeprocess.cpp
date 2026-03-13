@@ -1,4 +1,4 @@
-#include "include/core/processes/NativeProcess.h"
+#include "include/core/processes/nativeprocess.h"
 #include <unistd.h>
 #include <sys/wait.h>
 #include <fcntl.h>
@@ -6,11 +6,11 @@
 
 namespace gs {
 
-    NativeProcess::~NativeProcess() {
+    nativeprocess::~nativeprocess() {
         kill();
     }
 
-    bool NativeProcess::start(const std::string& command, const std::vector<std::string>& args) {
+    bool nativeprocess::start(const std::string& command, const std::vector<std::string>& args) {
         if (m_isRunning) return false;
 
         if (pipe(m_stdoutPipe) == -1 || pipe(m_stderrPipe) == -1) {
@@ -52,7 +52,7 @@ namespace gs {
 
     }
 
-    void NativeProcess::kill() {
+    void nativeprocess::kill() {
         if (m_isRunning && m_pid > 0) {
             ::kill(m_pid, SIGKILL);
             waitpid(m_pid, nullptr, 0);
@@ -60,7 +60,7 @@ namespace gs {
         }
     }
 
-        bool NativeProcess::isRunning() const {
+        bool nativeprocess::isRunning() const {
         if (!m_isRunning) return false;
 
         int status;
@@ -68,24 +68,24 @@ namespace gs {
         if (result == 0) return true; // Все еще работает
 
         if (WIFEXITED(status)) {
-            const_cast<NativeProcess*>(this)->m_exitCode = WEXITSTATUS(status);
+            const_cast<nativeprocess*>(this)->m_exitCode = WEXITSTATUS(status);
         } else {
-            const_cast<NativeProcess*>(this)->m_exitCode = -1;
+            const_cast<nativeprocess*>(this)->m_exitCode = -1;
         }
 
-        const_cast<NativeProcess*>(this)->m_isRunning = false;
+        const_cast<nativeprocess*>(this)->m_isRunning = false;
         return false;
     }
 
-    std::string NativeProcess::readAllStdout() {
+    std::string nativeprocess::readAllStdout() {
         return readFromPipe(m_stdoutPipe[0]);
     }
 
-    std::string NativeProcess::readAllStderr() {
+    std::string nativeprocess::readAllStderr() {
         return readFromPipe(m_stderrPipe[0]);
     }
 
-    std::string NativeProcess::readFromPipe(int fd) {
+    std::string nativeprocess::readFromPipe(int fd) {
         char buffer[4096];
         std::string result;
         ssize_t bytesRead;

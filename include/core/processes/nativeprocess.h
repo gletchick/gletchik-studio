@@ -1,19 +1,19 @@
 #pragma once
 
-#include "core/processes/IProcess.h"
+#include "core/processes/iprocess.h"
 #include <string>
 #include <vector>
 #include <sys/types.h>
 
 namespace gs {
 
-    class NativeProcess : public IProcess {
+    class nativeprocess : public iprocess {
     public:
-        NativeProcess() = default;
-        ~NativeProcess() override;
+        nativeprocess() = default;
+        ~nativeprocess() override;
 
-        NativeProcess(const NativeProcess&) = delete;
-        NativeProcess& operator=(const NativeProcess&) = delete;
+        nativeprocess(const nativeprocess&) = delete;
+        nativeprocess& operator=(const nativeprocess&) = delete;
 
         bool start(const std::string& command, const std::vector<std::string>& args) override;
         void kill() override;

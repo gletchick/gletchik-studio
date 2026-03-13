@@ -32,8 +32,8 @@ set(CORE_SOURCES
         src/core/execution/AbstractBuildController.cpp
         include/core/languages/java/JavaBuildController.h
         src/core/languages/java/JavaBuildController.cpp
-        utils/JavaParser.cpp
-        utils/JavaParser.h
+        src/ui/JavaParser.cpp
+        include/core/utils/JavaParser.h
 )
 
 add_executable(gletchik-studio

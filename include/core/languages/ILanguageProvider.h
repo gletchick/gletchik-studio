@@ -6,6 +6,7 @@
 #include "core/execution/IBuildStep.h"
 
 namespace gs {
+
     class ILanguageProvider {
     public:
         virtual ~ILanguageProvider() = default;
@@ -14,4 +15,5 @@ namespace gs {
             const std::string& projectPath,
             const std::string& sourceFilePath) = 0;
     };
+
 } // namespace gs

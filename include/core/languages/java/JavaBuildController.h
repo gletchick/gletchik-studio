@@ -9,7 +9,6 @@ namespace gs {
         ~JavaBuildController() override = default;
 
     protected:
-        // Возвращаем Java-специфичного провайдера
         std::shared_ptr<ILanguageProvider> createProvider(std::shared_ptr<IProcess> process) override;
     };
 

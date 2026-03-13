@@ -33,4 +33,5 @@ namespace gs {
     private:
         std::string m_className;
     };
+
 } // namespace gs

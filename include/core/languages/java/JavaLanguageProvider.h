@@ -7,8 +7,6 @@ namespace gs {
 
     class JavaLanguageProvider : public ILanguageProvider {
     public:
-        // Мы передаем shared_ptr на процесс, чтобы провайдер мог
-        // "раздать" его создаваемым шагам
         explicit JavaLanguageProvider(std::shared_ptr<IProcess> process);
 
         std::string languageName() const override;

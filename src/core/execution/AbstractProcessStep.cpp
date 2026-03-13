@@ -1,5 +1,6 @@
 #include "core/execution/AbstractProcessStep.h"
 #include <iostream>
+#include <unistd.h>
 
 namespace gs {
 
@@ -14,13 +15,13 @@ namespace gs {
         while (m_process->isRunning()) {
             std::cout << m_process->readAllStdout();
             std::cerr << m_process->readAllStderr();
+            usleep(1000);
         }
 
-        // Читаем оставшиеся данные после завершения процесса
         std::cout << m_process->readAllStdout();
         std::cerr << m_process->readAllStderr();
 
-        return true;
+        return m_process->getExitCode() == 0;
     }
 
 } // namespace gs

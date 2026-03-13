@@ -4,8 +4,8 @@
 namespace gs {
     class JavaCompileStep : public AbstractProcessStep {
     public:
-        JavaCompileStep(std::shared_ptr<IProcess> process, std::string sourceFilePath)
-            : AbstractProcessStep(std::move(process)), m_sourceFilePath(std::move(sourceFilePath)) {}
+        JavaCompileStep(std::shared_ptr<IProcess> process, std::vector<std::string> sources)
+        : AbstractProcessStep(std::move(process)), m_sources(std::move(sources)) {}
 
         std::string name() const override { return "Java Compiler"; }
         StepType type() const override { return StepType::Compile; }
@@ -15,7 +15,7 @@ namespace gs {
         std::vector<std::string> getArguments() const override;
 
     private:
-        std::string m_sourceFilePath;
+        std::vector<std::string> m_sources;
     };
 
     class JavaRunStep : public AbstractProcessStep {

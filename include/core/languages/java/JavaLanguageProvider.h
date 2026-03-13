@@ -13,8 +13,8 @@ namespace gs {
 
         std::string languageName() const override;
 
-        // Главный метод: возвращает вектор из JavaCompileStep и JavaRunStep
-        virtual std::vector<std::shared_ptr<IBuildStep>> getBuildPipeline(
+
+        std::vector<std::shared_ptr<IBuildStep>> getBuildPipeline(
             const std::string& projectPath,
             const std::string& className) override;
 

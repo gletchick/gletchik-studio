@@ -21,7 +21,9 @@ bool NativeProcess::start(const std::string& command, const std::vector<std::str
 
     if (m_pid < 0) {
         return false;
-    } else if (m_pid == 0) {
+    }
+
+    if (m_pid == 0) {
         close(m_stdoutPipe[0]);
         close(m_stderrPipe[0]);
 
@@ -37,16 +39,17 @@ bool NativeProcess::start(const std::string& command, const std::vector<std::str
 
         execvp(command.c_str(), c_args.data());
         exit(1);
-    } else {
-        close(m_stdoutPipe[1]);
-        close(m_stderrPipe[1]);
-
-        fcntl(m_stdoutPipe[0], F_SETFL, O_NONBLOCK);
-        fcntl(m_stderrPipe[0], F_SETFL, O_NONBLOCK);
-
-        m_isRunning = true;
-        return true;
     }
+
+    close(m_stdoutPipe[1]);
+    close(m_stderrPipe[1]);
+
+    fcntl(m_stdoutPipe[0], F_SETFL, O_NONBLOCK);
+    fcntl(m_stderrPipe[0], F_SETFL, O_NONBLOCK);
+
+    m_isRunning = true;
+    return true;
+
 }
 
 void NativeProcess::kill() {
@@ -57,12 +60,19 @@ void NativeProcess::kill() {
     }
 }
 
-bool NativeProcess::isRunning() const {
+    bool NativeProcess::isRunning() const {
     if (!m_isRunning) return false;
 
     int status;
     pid_t result = waitpid(m_pid, &status, WNOHANG);
-    if (result == 0) return true;
+    if (result == 0) return true; // Все еще работает
+
+    if (WIFEXITED(status)) {
+        // Процесс завершился сам, сохраняем код (0 - успех, не 0 - ошибка)
+        const_cast<NativeProcess*>(this)->m_exitCode = WEXITSTATUS(status);
+    } else {
+        const_cast<NativeProcess*>(this)->m_exitCode = -1;
+    }
 
     const_cast<NativeProcess*>(this)->m_isRunning = false;
     return false;
@@ -87,5 +97,6 @@ std::string NativeProcess::readFromPipe(int fd) {
 
     return result;
 }
+
 
 } // namespace gs

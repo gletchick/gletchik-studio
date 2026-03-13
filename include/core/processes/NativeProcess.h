@@ -22,6 +22,8 @@ namespace gs {
         std::string readAllStdout() override;
         std::string readAllStderr() override;
 
+        int getExitCode() const override { return m_exitCode; }
+
     private:
         std::string readFromPipe(int fd);
 
@@ -30,6 +32,7 @@ namespace gs {
 
         int m_stdoutPipe[2] = {-1, -1};
         int m_stderrPipe[2] = {-1, -1};
+        int m_exitCode = 0;
     };
 
 } // namespace gs

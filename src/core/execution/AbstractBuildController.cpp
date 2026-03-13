@@ -6,14 +6,12 @@
 namespace gs {
 
     AbstractBuildController::AbstractBuildController() {
-        // По умолчанию используем наш NativeProcess
         m_process = std::make_shared<NativeProcess>();
     }
 
     bool AbstractBuildController::runProject(const std::string& projectPath, 
                                              const std::string& sourceFilePath, 
                                              StepType untilStep) {
-        // Вызываем метод, который реализуют наследники (Java, C++, и т.д.)
         auto provider = createProvider(m_process);
 
         if (!provider) {
@@ -30,10 +28,8 @@ namespace gs {
     }
 
     void AbstractBuildController::stop() {
-        // Останавливаем раннер, чтобы он не запускал следующие шаги
         m_runner.stop();
         
-        // Убиваем текущий процесс (например, если программа зациклилась)
         if (m_process) {
             m_process->kill();
         }

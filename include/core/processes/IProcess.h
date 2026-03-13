@@ -13,6 +13,7 @@ namespace gs {
 
         virtual std::string readAllStdout() = 0;
         virtual std::string readAllStderr() = 0;
+        virtual int getExitCode() const = 0;
     };
 
 } // namespace gs

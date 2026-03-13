@@ -3,7 +3,11 @@
 namespace gs {
 
     std::vector<std::string> JavaCompileStep::getArguments() const {
-        return { "-d", ".", m_sourceFilePath };
+        std::vector<std::string> args = { "-d", "." };
+
+        args.insert(args.end(), m_sources.begin(), m_sources.end());
+
+        return args;
     }
 
     std::vector<std::string> JavaRunStep::getArguments() const {

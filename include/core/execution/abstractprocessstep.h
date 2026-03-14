@@ -3,8 +3,8 @@
 #include <string>
 #include <vector>
 
-#include "ibuildstep.h"
-#include "core/processes/iprocess.h"
+#include "../../../sdk/ibuildstep.h"
+#include "../../../sdk/iprocess.h"
 
 namespace gs {
 

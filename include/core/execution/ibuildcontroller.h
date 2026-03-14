@@ -1,6 +1,6 @@
 #pragma once
 #include <string>
-#include "core/steptype.h"
+#include "../../../sdk/steptype.h"
 
 namespace gs {
 

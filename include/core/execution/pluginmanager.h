@@ -3,8 +3,8 @@
 #include <string>
 #include <memory>
 #include <vector>
-#include "core/languages/ilanguageprovider.h"
-#include "core/processes/iprocess.h"
+#include "../../../sdk/ilanguageprovider.h"
+#include "../../../sdk/iprocess.h"
 
 namespace gs {
 

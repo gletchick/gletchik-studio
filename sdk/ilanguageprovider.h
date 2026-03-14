@@ -3,7 +3,7 @@
 #include <vector>
 #include <string>
 
-#include "core/execution/ibuildstep.h"
+#include "ibuildstep.h"
 
 namespace gs {
 

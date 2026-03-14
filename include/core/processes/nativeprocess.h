@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/processes/iprocess.h"
+#include "../../../sdk/iprocess.h"
 #include <string>
 #include <vector>
 

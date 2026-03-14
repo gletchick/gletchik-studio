@@ -1,6 +1,6 @@
 #pragma once
-#include "../ilanguageprovider.h"
-#include "core/processes/iprocess.h"
+#include "../../../../sdk/ilanguageprovider.h"
+#include "../../../../sdk/iprocess.h"
 #include <memory>
 
 namespace gs {

@@ -1,8 +1,8 @@
 #pragma once
 #include "ibuildcontroller.h"
 #include "core/execution/steprunner.h"
-#include "core/processes/iprocess.h"
-#include "../languages/ilanguageprovider.h"
+#include "../../../sdk/iprocess.h"
+#include "../../../sdk/ilanguageprovider.h"
 #include <memory>
 
 namespace gs {

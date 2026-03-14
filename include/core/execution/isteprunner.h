@@ -2,8 +2,8 @@
 #include <memory>
 #include <vector>
 
-#include "ibuildstep.h"
-#include "../steptype.h"
+#include "../../../sdk/ibuildstep.h"
+#include "../../../sdk/steptype.h"
 
 namespace gs {
 

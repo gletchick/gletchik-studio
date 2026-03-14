@@ -34,6 +34,8 @@ set(CORE_SOURCES
         src/core/languages/java/JavaBuildController.cpp
         src/core/utils/JavaParser.cpp
         include/core/utils/javaparser.h
+        include/core/execution/pluginmanager.h
+        src/core/execution/PlaginManager.cpp
 )
 
 add_executable(gletchik-studio
@@ -42,11 +44,17 @@ add_executable(gletchik-studio
         ${CORE_SOURCES}
 )
 
-# Это позволит писать #include "core/..." без полных путей
 target_include_directories(gletchik-studio PUBLIC include)
 
 target_link_libraries(gletchik-studio
+        PRIVATE
         Qt5::Core
         Qt5::Gui
         Qt5::Widgets
+        dl
 )
+
+# Позволяет динамическим библиотекам обращаться к символам исполняемого файла
+set_target_properties(gletchik-studio PROPERTIES ENABLE_EXPORTS ON)
+# Или просто добавь флаг линковки:
+target_link_options(gletchik-studio PRIVATE "-rdynamic")

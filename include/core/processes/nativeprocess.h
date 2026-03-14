@@ -3,7 +3,6 @@
 #include "core/processes/iprocess.h"
 #include <string>
 #include <vector>
-#include <sys/types.h>
 
 namespace gs {
 

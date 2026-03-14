@@ -1,5 +1,5 @@
 #pragma once
-#include "core/languages/ilanguageprovider.h"
+#include "../ilanguageprovider.h"
 #include "core/processes/iprocess.h"
 #include <memory>
 

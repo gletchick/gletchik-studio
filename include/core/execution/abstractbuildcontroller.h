@@ -2,7 +2,7 @@
 #include "ibuildcontroller.h"
 #include "core/execution/steprunner.h"
 #include "core/processes/iprocess.h"
-#include "core/languages/ilanguageprovider.h"
+#include "../languages/ilanguageprovider.h"
 #include <memory>
 
 namespace gs {

@@ -12,8 +12,7 @@ namespace gs {
     public:
         explicit AbstractProcessStep(std::shared_ptr<IProcess> process);
         virtual ~AbstractProcessStep() = default;
-
-        bool execute() override;
+        bool execute(LogCallback logger) override;
 
     protected:
         virtual std::string getCommand() const = 0;

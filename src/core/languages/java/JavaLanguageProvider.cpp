@@ -54,4 +54,15 @@ namespace gs {
         return pipeline;
     }
 
+    std::vector<HighlightRule> JavaLanguageProvider::getSyntaxRules() const {
+        static const std::vector<HighlightRule> rules = {
+            {"\\b(abstract|assert|boolean|break|byte|case|catch|char|class|const|continue|default|do|double|else|enum|extends|final|finally|float|for|goto|if|implements|import|instanceof|int|interface|long|native|new|package|private|protected|public|return|short|static|strictfp|super|switch|synchronized|this|throw|throws|transient|try|void|volatile|while)\\b", TextStyle::Keyword},
+            {"\\b[A-Z][a-zA-Z0-9_]*\\b", TextStyle::Type},
+            {"\"([^\\\\\"]|\\\\.)*\"", TextStyle::String},
+            {"//.*|/\\*[\\s\\S]*?\\*/", TextStyle::Comment},
+            {"\\b\\d+(\\.\\d+)?([eE][+-]?\\d+)?[fFdDL]?\\b", TextStyle::Number}
+        };
+        return rules;
+    }
+
 } // namespace gs

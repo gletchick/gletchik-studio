@@ -73,7 +73,7 @@ namespace gs {
         }
     }
 
-        bool NativeProcess::isRunning() const {
+        bool NativeProcess::isRunning() {
         if (!m_isRunning) return false;
 
         int status;

@@ -16,7 +16,7 @@ namespace gs {
 
         bool start(const std::string& command, const std::vector<std::string>& args) override;
         void kill() override;
-        bool isRunning() const override;
+        bool isRunning() override;
 
         std::string readAllStdout() override;
         std::string readAllStderr() override;

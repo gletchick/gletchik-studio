@@ -37,6 +37,8 @@ set(CORE_SOURCES
         include/core/execution/pluginmanager.h
         src/core/execution/PlaginManager.cpp
         sdk/syntaxrules.h
+        include/core/utils/threadsafequeue.h
+        src/core/utils/threadsafequeue.cpp
 )
 
 add_executable(gletchik-studio

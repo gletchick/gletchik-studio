@@ -3,6 +3,7 @@
 #include <vector>
 
 namespace gs {
+
     enum class TextStyle {
         Keyword, Type, String, Comment, Number
     };
@@ -17,4 +18,5 @@ namespace gs {
         virtual ~ISyntaxProvider() = default;
         virtual std::vector<HighlightRule> getSyntaxRules() const = 0;
     };
+
 } // namespace gs

@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/">
+        <file>themes/dark.qss</file>
+        <file>icons/project.svg</file>
+        <file>icons/terminal.svg</file>
+        <file>icons/run.svg</file>
+    </qresource>
+</RCC>

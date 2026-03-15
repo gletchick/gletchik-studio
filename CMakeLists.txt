@@ -9,8 +9,10 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 
 find_package(Qt5 COMPONENTS Core Gui Widgets REQUIRED)
-
-set(CMAKE_AUTOUIC_SEARCH_PATHS src/ui/windows)
+set(CMAKE_AUTOUIC_SEARCH_PATHS
+        "resources/ui/windows"
+        "resources/ui/sidebar"
+)
 
 # Группируем файлы для удобства
 set(CORE_SOURCES
@@ -30,6 +32,7 @@ set(CORE_SOURCES
         include/core/execution/abstractbuildcontroller.h
         src/core/execution/AbstractBuildController.cpp
         include/core/languages/java/javabuildbontroller.h
+        include/core/languages/java/javalanguageprovider.h
         src/core/languages/java/JavaBuildController.cpp
         src/core/utils/JavaParser.cpp
         include/core/utils/javaparser.h
@@ -38,13 +41,20 @@ set(CORE_SOURCES
         sdk/syntaxrules.h
         include/core/utils/threadsafequeue.h
         src/core/utils/threadsafequeue.cpp
+        src/core/languages/java/JavaLanguageProvider.cpp
 )
 
 add_executable(gletchik-studio
         main.cpp
-        resources/resources.qrc
+        resources/app.qrc
         ${CORE_SOURCES}
-)
+        src/gui/windows/MainWindow.cpp
+        include/gui/windows/mainwindow.h
+        resources/ui/windows/mainwindow.ui
+        src/gui/sidebar/SideBar.cpp
+        include/gui/sidebar/sidebar.h
+        resources/ui/sidebar/sidebar.ui
+    )
 
 target_include_directories(gletchik-studio PUBLIC include)
 
@@ -56,7 +66,5 @@ target_link_libraries(gletchik-studio
         dl
 )
 
-# Позволяет динамическим библиотекам обращаться к символам исполняемого файла
 set_target_properties(gletchik-studio PROPERTIES ENABLE_EXPORTS ON)
-# Или просто добавь флаг линковки:
 target_link_options(gletchik-studio PRIVATE "-rdynamic")

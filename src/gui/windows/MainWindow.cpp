@@ -1,8 +1,14 @@
 #include "gui/windows/mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QWindow>
+#include <QString>
 #include <QLabel>
 #include "gui/sidebar/sidebar.h"
+#include  <QTimer>
+#include <thread>
+
+#include "core/languages/java/javabuildbontroller.h"
+#include "sdk/steptype.h"
 
 namespace gs {
 
@@ -97,10 +103,9 @@ void MainWindow::setupCentralArea() {
     upperLayout->addWidget(m_hSplitter);
 
     // --- НИЖНЯЯ ЧАСТЬ ---
-    m_terminal = new QTextEdit();
+    m_terminal = new TerminalWidget(); // <-- Наш кастомный терминал
     m_terminal->setObjectName("terminalWidget");
-    m_terminal->setPlaceholderText("Terminal >_");
-    m_terminal->setMinimumHeight(50); // Уменьшили порог для плавности
+    m_terminal->setMinimumHeight(50);
 
     m_vSplitter->addWidget(upperWidget);
     m_vSplitter->addWidget(m_terminal);
@@ -114,6 +119,16 @@ void MainWindow::setupCentralArea() {
 
     connect(sidebar, &Sidebar::projectToggled, this, &MainWindow::onProjectToggled);
     connect(sidebar, &Sidebar::terminalToggled, this, &MainWindow::onTerminalToggled);
+
+    connect(sidebar, &Sidebar::runClicked, this, &MainWindow::onRunClicked);
+
+    // Связываем ввод пользователя с отправкой в процесс
+    connect(m_terminal, &TerminalWidget::inputReady, this, &MainWindow::onTerminalInput);
+
+    // Запускаем таймер для чтения очереди ThreadSafeQueue
+    m_updateTimer = new QTimer(this);
+    connect(m_updateTimer, &QTimer::timeout, this, &MainWindow::processOutputQueue);
+    m_updateTimer->start(50); // Проверяем очередь каждые 50 мс
 }
 
 void MainWindow::onProjectToggled(bool checked) {
@@ -199,4 +214,52 @@ void MainWindow::updateCursorShape(const QPoint &pos) {
     }
 }
 
+    void MainWindow::onRunClicked() {
+    m_terminal->clearTerminal();
+    m_terminal->appendOutput("--- Starting Java Application ---\n", false);
+
+    if (!m_controller) {
+        m_controller = std::make_shared<JavaBuildController>();
+    } else {
+        m_controller->stop(); // Останавливаем предыдущий запуск, если он был
+    }
+
+    // Запускаем процесс в фоновом потоке, чтобы не блокировать GUI!
+    std::thread([this]() {
+        std::string projectPath = ".";        // Путь к корню
+        std::string sourceFilePath = "Main.java"; // Точка входа
+
+        m_controller->runProject(projectPath, sourceFilePath, StepType::Run,
+            [this](const std::string& text, bool isError) {
+                // Префиксируем сообщение, чтобы в UI потоке понимать, ошибка это или нет
+                std::string prefix = isError ? "E:" : "O:";
+                m_outputQueue.push(prefix + text);
+            }
+        );
+
+        m_outputQueue.push("O:\n--- Process Finished ---\n");
+    }).detach();
+
+
+
+
+}
+
+    void MainWindow::onTerminalInput(const QString& text) {
+    if (m_controller) {
+        m_controller->writeInput(text.toStdString());
+    }
+}
+
+    void MainWindow::processOutputQueue() {
+    while (auto msg = m_outputQueue.tryPop()) {
+        QString text = QString::fromStdString(*msg);
+
+        // Расшифровываем префикс
+        bool isError = text.startsWith("E:");
+
+        // Выводим в терминал (убрав первые 2 символа префикса)
+        m_terminal->appendOutput(text.mid(2), isError);
+    }
+}
 } // namespace gs

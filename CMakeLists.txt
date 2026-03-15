@@ -42,6 +42,8 @@ set(CORE_SOURCES
         include/core/utils/threadsafequeue.h
         src/core/utils/threadsafequeue.cpp
         src/core/languages/java/JavaLanguageProvider.cpp
+        include/gui/terminalwidget.h
+        src/gui/TerminalWidget.cpp
 )
 
 add_executable(gletchik-studio

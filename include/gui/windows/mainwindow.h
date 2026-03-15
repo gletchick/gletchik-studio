@@ -8,11 +8,15 @@
 #include <QSplitter>
 #include <QTextEdit>
 
+#include "core/utils/threadsafequeue.h"
+#include "gui/terminalwidget.h"
+
 namespace Ui {
     class MainWindow;
 }
 
 namespace gs {
+    class JavaBuildController;
 
     class MainWindow : public QWidget {
         Q_OBJECT
@@ -34,6 +38,10 @@ namespace gs {
         void onProjectToggled(bool checked);
         void onTerminalToggled(bool checked);
 
+        void onRunClicked();
+        void onTerminalInput(const QString& text);
+        void processOutputQueue();
+
     private:
         Ui::MainWindow *ui;
 
@@ -43,15 +51,20 @@ namespace gs {
 
         QPushButton *m_btnMaximize;
 
-        QWidget *m_fileExplorer;
-        QTextEdit *m_terminal;
-        QSplitter *m_hSplitter;
-        QSplitter *m_vSplitter;
 
         ResizeDir getResizeDir(const QPoint &pos);
         void updateCursorShape(const QPoint &pos);
         void setupTitleBar();
         void setupCentralArea();
+
+        QWidget *m_fileExplorer;
+        TerminalWidget *m_terminal;
+        QSplitter *m_hSplitter;
+        QSplitter *m_vSplitter;
+
+        ThreadSafeQueue m_outputQueue;
+        QTimer *m_updateTimer;
+        std::shared_ptr<JavaBuildController> m_controller;
     };
 
 } // namespace gs

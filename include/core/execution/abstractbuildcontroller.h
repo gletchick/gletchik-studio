@@ -14,7 +14,8 @@ namespace gs {
 
         bool runProject(const std::string& projectPath, 
                         const std::string& sourceFilePath, 
-                        StepType untilStep) override;
+                        StepType untilStep,
+                        LogCallback logger) override;
 
         void stop() override;
 

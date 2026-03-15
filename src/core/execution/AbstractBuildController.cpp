@@ -11,7 +11,8 @@ namespace gs {
 
     bool AbstractBuildController::runProject(const std::string& projectPath, 
                                              const std::string& sourceFilePath, 
-                                             StepType untilStep) {
+                                             StepType untilStep,
+                                             LogCallback logger) {
         auto provider = createProvider(m_process);
 
         if (!provider) {
@@ -24,7 +25,7 @@ namespace gs {
 
         std::cout << "--- Starting build via " << provider->languageName() << " Controller ---" << std::endl;
         
-        return m_runner.runUntil(untilStep);
+        return m_runner.runUntil(untilStep, logger);
     }
 
     void AbstractBuildController::stop() {

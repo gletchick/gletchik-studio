@@ -11,7 +11,7 @@ namespace gs {
     public:
         virtual ~IStepRunner() = default;
         virtual void setSteps(std::vector<std::shared_ptr<IBuildStep>> steps) = 0;
-        virtual bool runUntil(StepType type) = 0;
+        virtual bool runUntil(StepType type, LogCallback logger) = 0;
         virtual void stop() = 0;
     };
 

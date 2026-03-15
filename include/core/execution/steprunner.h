@@ -11,7 +11,7 @@ namespace gs {
 
         void setSteps(std::vector<std::shared_ptr<IBuildStep>> steps) override;
 
-        bool runUntil(StepType type) override;
+        bool runUntil(StepType type, LogCallback logger) override;
 
         void stop() override;
 

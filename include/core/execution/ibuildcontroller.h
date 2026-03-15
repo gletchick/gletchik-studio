@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include "../../../sdk/steptype.h"
+#include "sdk/ibuildstep.h"
 
 namespace gs {
 
@@ -9,12 +10,13 @@ namespace gs {
         virtual ~IBuildController() = default;
 
         virtual bool runProject(const std::string& projectPath,
-                                const std::string& sourceFilePath, 
-                                StepType untilStep) = 0;
+                                const std::string& sourceFilePath,
+                                StepType untilStep,
+                                LogCallback logger) = 0;
 
         virtual void stop() = 0;
         virtual void writeInput(const std::string& input) = 0;
 
     };
 
-} // namespace gs
+} // namespace g

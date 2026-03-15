@@ -26,7 +26,6 @@ set(CORE_SOURCES
         src/core/execution/AbstractProcessStep.cpp
         src/core/execution/StepRunner.cpp
         src/core/languages/java/JavaSteps.cpp
-        src/core/languages/java/JavaLanguageProvider.cpp
         include/core/execution/ibuildcontroller.h
         include/core/execution/abstractbuildcontroller.h
         src/core/execution/AbstractBuildController.cpp

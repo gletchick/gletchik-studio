@@ -12,7 +12,7 @@ namespace gs {
         });
     }
 
-    bool StepRunner::runUntil(StepType type) {
+    bool StepRunner::runUntil(StepType type, LogCallback logger) {
         m_stopRequested = false;
 
         for (const auto& step : m_steps) {
@@ -20,7 +20,7 @@ namespace gs {
                 break;
             }
 
-            if (!step->execute()) {
+            if (!step->execute(logger)) {
                 return false;
             }
         }

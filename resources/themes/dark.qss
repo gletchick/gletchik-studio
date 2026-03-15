@@ -1,11 +1,86 @@
-/* Обращаемся напрямую к нашему классу */
+/* ================= Главное окно ================= */
 QWidget#MainWindow {
-    background-color: #1e1e1e; /* Глубокий темно-серый */
-    border: none;              /* На всякий случай убираем рамки */
+    background-color: #1e1e1e;
+    border: 1px solid #3c3c3c;
 }
 
-/* Если внутри появятся другие виджеты, зададим им базовый цвет текста */
-QWidget {
+/* ================= Верхняя панель ================= */
+QWidget#titleBarWidget {
+    background-color: #323233;
+}
+
+QLabel#titleLabel {
+    color: #cccccc;
+    padding-left: 10px;
+    font-size: 12px;
+}
+
+/* Кнопки управления окном */
+QPushButton#btnMinimize, QPushButton#btnMaximize, QPushButton#btnClose {
+    background-color: transparent;
+    color: #ffffff;
+    border: none;
+    width: 45px;
+    height: 35px;
+    font-size: 14px;
+}
+
+QPushButton#btnMinimize:hover, QPushButton#btnMaximize:hover {
+    background-color: #444444;
+}
+
+QPushButton#btnClose:hover {
+    background-color: #e81123;
+}
+
+/* ================= Боковая панель (Sidebar) ================= */
+QWidget#leftSidebar {
+    background-color: #333333;
+    border-right: 1px solid #252526;
+}
+
+QToolButton {
+    background-color: transparent;
+    border: none;
+    border-left: 3px solid transparent; /* Подготовка для индикатора активности */
+}
+
+QToolButton:hover {
+    background-color: #444444;
+}
+
+QToolButton:checked {
+    border-left: 3px solid #007acc; /* Синяя полоска как в VS Code */
+    background-color: #3a3d41;
+}
+
+/* ================= Центральная область ================= */
+QWidget#fileExplorer {
+    background-color: #252526;
+}
+
+QTextEdit#codeEditor {
+    background-color: #1e1e1e;
     color: #d4d4d4;
-    font-family: "Segoe UI", sans-serif;
+    border: none;
+    font-family: Consolas, monospace;
+    font-size: 14px;
+    padding: 10px;
+}
+
+/* ================= Терминал ================= */
+QTextEdit#terminalWidget {
+    background-color: #1e1e1e;
+    color: #cccccc;
+    border-top: 1px solid #3c3c3c;
+    border-left: none;
+    border-right: none;
+    border-bottom: none;
+    font-family: Consolas, monospace;
+    padding: 5px;
+}
+
+/* ================= Разделители (Сплиттеры) ================= */
+QSplitter::handle {
+    background-color: #3c3c3c;
 }

@@ -85,9 +85,7 @@ void MainWindow::setupCentralArea() {
     m_hSplitter->setHandleWidth(1);
     m_hSplitter->setChildrenCollapsible(false); // ВАЖНО: Отключаем резкое схлопывание
 
-    m_fileExplorer = new QWidget();
-    m_fileExplorer->setObjectName("fileExplorer");
-    m_fileExplorer->setMinimumWidth(50); // Уменьшили порог до 50px для плавности
+    m_fileExplorer = new FileExplorerWidget();
 
     QTextEdit *editor = new QTextEdit();
     editor->setObjectName("codeEditor");

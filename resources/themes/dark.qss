@@ -84,3 +84,73 @@ QTextEdit#terminalWidget {
 QSplitter::handle {
     background-color: #3c3c3c;
 }
+
+/* ================= Дерево файлов (QTreeView) ================= */
+QTreeView {
+    background-color: #252526;
+    color: #cccccc;
+    border: none;
+    font-size: 17px;
+    outline: none;
+    /* Убираем синее подсвечивание иконок (selection-color) */
+    show-decoration-selected: 1;
+}
+
+/* Состояние при наведении — полностью отключаем */
+QTreeView::item:hover {
+    background-color: transparent;
+}
+
+/* Состояние при выделении — только фон */
+QTreeView::item:selected {
+    background-color: #37373d;
+    color: #cccccc; /* Оставляем текст серым или ставим #ffffff */
+}
+
+/* --- Ветки (Стрелочки) --- */
+
+/* Убираем любые изменения фона у веток при наведении */
+QTreeView::branch:hover {
+    background-color: transparent;
+}
+
+/* Чтобы фон ветки при выделении совпадал с фоном строки */
+QTreeView::branch:selected {
+    background-color: #37373d;
+}
+
+/* Состояние: Закрыто */
+QTreeView::branch:has-children:!has-siblings:closed,
+QTreeView::branch:closed:has-children:has-siblings {
+    image: url(:/icons/arrow-right.svg);
+}
+
+/* Состояние: Открыто */
+QTreeView::branch:open:has-children:!has-siblings,
+QTreeView::branch:open:has-children:has-siblings {
+    image: url(:/icons/arrow-down.svg);
+}
+
+/* Убираем "белый квадрат", который вы видели */
+QTreeView::branch:open:has-children:hover,
+QTreeView::branch:closed:has-children:hover {
+    background-color: transparent; /* Было #ffffff, теперь прозрачно */
+}
+
+/* ================= Контекстное меню (QMenu) ================= */
+QMenu {
+    background-color: #252526;
+    color: #cccccc;
+    border: 1px solid #454545;
+    padding: 5px 0px;
+}
+
+QMenu::item {
+    padding: 5px 20px 5px 20px;
+}
+
+QMenu::separator {
+    height: 1px;
+    background-color: #454545;
+    margin: 4px 0px;
+}

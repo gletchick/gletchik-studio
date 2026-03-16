@@ -9,6 +9,7 @@
 #include <QTextEdit>
 
 #include "core/utils/threadsafequeue.h"
+#include "gui/fileexplorerwidget.h"
 #include "gui/terminalwidget.h"
 
 namespace Ui {
@@ -57,7 +58,7 @@ namespace gs {
         void setupTitleBar();
         void setupCentralArea();
 
-        QWidget *m_fileExplorer;
+        FileExplorerWidget *m_fileExplorer;
         TerminalWidget *m_terminal;
         QSplitter *m_hSplitter;
         QSplitter *m_vSplitter;

@@ -3,6 +3,8 @@
         <file>themes/dark.qss</file>
         <file>icons/project.svg</file>
         <file>icons/terminal.svg</file>
+        <file>icons/arrow-down.svg</file>
+        <file>icons/arrow-right.svg</file>
         <file>icons/run.svg</file>
     </qresource>
 </RCC>

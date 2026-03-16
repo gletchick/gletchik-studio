@@ -44,6 +44,10 @@ set(CORE_SOURCES
         src/core/languages/java/JavaLanguageProvider.cpp
         include/gui/terminalwidget.h
         src/gui/TerminalWidget.cpp
+        include/gui/fileexplorerwidget.h
+        src/gui/FileExplorerWidget.cpp
+        include/gui/customiconprovider.h
+        src/gui/CustomIconProvider.cpp
 )
 
 add_executable(gletchik-studio

@@ -4,8 +4,9 @@
 #include <QString>
 #include <QLabel>
 #include "gui/sidebar/sidebar.h"
-#include  <QTimer>
+#include <QTimer>
 #include <thread>
+#include <QFile>
 
 #include "core/languages/java/javabuildbontroller.h"
 #include "sdk/steptype.h"
@@ -87,13 +88,21 @@ void MainWindow::setupCentralArea() {
 
     m_fileExplorer = new FileExplorerWidget();
 
-    QTextEdit *editor = new QTextEdit();
-    editor->setObjectName("codeEditor");
-    editor->setPlaceholderText("// Пишите код здесь...");
-    editor->setMinimumWidth(100); // Чтобы редактор тоже нельзя было сжать в 0
+    m_codeEditor = new QTextEdit(); // Используем переменную класса
+    m_codeEditor->setObjectName("codeEditor");
+    m_codeEditor->setPlaceholderText("// Пишите код здесь...");
+    m_codeEditor->setMinimumWidth(100);
 
     m_hSplitter->addWidget(m_fileExplorer);
-    m_hSplitter->addWidget(editor);
+    m_hSplitter->addWidget(m_codeEditor); // Добавляем в сплиттер
+
+    connect(m_fileExplorer, &FileExplorerWidget::fileSelected, this, [this](const QString &path) {
+        QFile file(path);
+        if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+            m_codeEditor->setPlainText(QString::fromUtf8(file.readAll()));
+            file.close();
+        }
+    });
 
     m_hSplitter->setStretchFactor(0, 0);
     m_hSplitter->setStretchFactor(1, 1);

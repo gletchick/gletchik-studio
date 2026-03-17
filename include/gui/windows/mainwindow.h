@@ -60,6 +60,7 @@ namespace gs {
 
         FileExplorerWidget *m_fileExplorer;
         TerminalWidget *m_terminal;
+        QTextEdit *m_codeEditor;
         QSplitter *m_hSplitter;
         QSplitter *m_vSplitter;
 

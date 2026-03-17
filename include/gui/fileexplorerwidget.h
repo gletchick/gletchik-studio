@@ -13,12 +13,13 @@ namespace gs {
 
     public:
         explicit FileExplorerWidget(QWidget *parent = nullptr);
-        
-        // Метод для установки корневой директории проекта
         void setRootPath(const QString &path);
 
+        signals:
+            // Сигнал, который пошлет путь к файлу в MainWindow
+            void fileSelected(const QString &filePath);
+
     private slots:
-        // Слот для отображения контекстного меню при клике ПКМ
         void showContextMenu(const QPoint &pos);
 
     private:

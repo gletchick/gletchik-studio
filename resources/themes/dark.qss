@@ -4,153 +4,235 @@ QWidget#MainWindow {
     border: 1px solid #3c3c3c;
 }
 
-/* ================= Верхняя панель ================= */
+/* ================= Верхняя панель (Title Bar) ================= */
 QWidget#titleBarWidget {
-    background-color: #323233;
+    background-color: #252526; /* Сделал чуть темнее для солидности */
+    border-bottom: 1px solid #1a1a1a;
 }
 
 QLabel#titleLabel {
-    color: #cccccc;
-    padding-left: 10px;
-    font-size: 12px;
+    color: #858585; /* Приглушенный серый */
+    font-size: 10px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    padding-left: 12px;
 }
 
-/* Кнопки управления окном */
+/* Компактные кнопки управления окном */
 QPushButton#btnMinimize, QPushButton#btnMaximize, QPushButton#btnClose {
     background-color: transparent;
-    color: #ffffff;
+    color: #969696;
     border: none;
-    width: 45px;
+    width: 32px;  /* Уменьшили ширину */
     height: 35px;
-    font-size: 14px;
+    font-size: 11px;
 }
 
 QPushButton#btnMinimize:hover, QPushButton#btnMaximize:hover {
-    background-color: #444444;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
 }
 
 QPushButton#btnClose:hover {
     background-color: #e81123;
+    color: white;
 }
 
 /* ================= Боковая панель (Sidebar) ================= */
 QWidget#leftSidebar {
-    background-color: #333333;
-    border-right: 1px solid #252526;
+    background-color: #181818; /* Делаем чуть чернее, чем дерево (#2b2d30) */
+    border-right: 1px solid #1a1a1a; /* Тёмная, но заметная линия-разделитель */
 }
 
+/* Настройка кнопок, чтобы они не "прилипали" к разделителю */
 QToolButton {
     background-color: transparent;
     border: none;
-    border-left: 3px solid transparent; /* Подготовка для индикатора активности */
+    border-left: 2px solid transparent; /* Место под синий индикатор */
+    margin-right: 1px; /* Микро-отступ справа, чтобы не касаться границы */
+    width: 37px;
+    height: 38px;
 }
 
 QToolButton:hover {
-    background-color: #444444;
+    background-color: #2d2d2d;
 }
 
 QToolButton:checked {
-    border-left: 3px solid #007acc; /* Синяя полоска как в VS Code */
-    background-color: #3a3d41;
+    background-color: #2b2d30; /* Цвет фона дерева, чтобы кнопка "вливалась" в него */
+    border-left: 2px solid #007acc; /* Синяя полоска */
 }
 
-/* ================= Центральная область ================= */
+/* ================= Проводник и Дерево файлов ================= */
 QWidget#fileExplorer {
-    background-color: #252526;
+    background-color: #2b2d30; /* Цвет New UI в IntelliJ */
 }
 
-QTextEdit#codeEditor {
-    background-color: #1e1e1e;
-    color: #d4d4d4;
-    border: none;
-    font-family: Consolas, monospace;
-    font-size: 14px;
-    padding: 10px;
-}
-
-/* ================= Терминал ================= */
-QTextEdit#terminalWidget {
-    background-color: #1e1e1e;
-    color: #cccccc;
-    border-top: 1px solid #3c3c3c;
-    border-left: none;
-    border-right: none;
-    border-bottom: none;
-    font-family: Consolas, monospace;
-    padding: 5px;
-}
-
-/* ================= Разделители (Сплиттеры) ================= */
-QSplitter::handle {
-    background-color: #3c3c3c;
-}
-
-/* ================= Дерево файлов (QTreeView) ================= */
 QTreeView {
-    background-color: #252526;
-    color: #cccccc;
+    background-color: #2b2d30;
+    color: #dfe1e5;
     border: none;
-    font-size: 17px;
+    font-size: 13px;
     outline: none;
-    /* Убираем синее подсвечивание иконок (selection-color) */
-    show-decoration-selected: 1;
+    padding-top: 5px;
 }
 
-/* Состояние при наведении — полностью отключаем */
+/* Эстетичная высота строки и отступы */
+QTreeView::item {
+    height: 26px;
+    padding-left: 4px;
+}
+
+/* Мягкое наведение как в современных IDE */
 QTreeView::item:hover {
-    background-color: transparent;
+    background-color: #2e3136;
+    color: #ffffff;
 }
 
-/* Состояние при выделении — только фон */
+/* Фирменный синий цвет выделения IntelliJ */
 QTreeView::item:selected {
-    background-color: #37373d;
-    color: #cccccc; /* Оставляем текст серым или ставим #ffffff */
+    background-color: #2e436e;
+    color: #ffffff;
 }
 
-/* --- Ветки (Стрелочки) --- */
-
-/* Убираем любые изменения фона у веток при наведении */
-QTreeView::branch:hover {
+/* УБИРАЕМ СИНЕВУ У ВЕТОК (СТРЕЛОЧЕК) */
+QTreeView::branch {
     background-color: transparent;
 }
 
-/* Чтобы фон ветки при выделении совпадал с фоном строки */
+/* Синхронизируем фон ветки с фоном всей строки при наведении и выборе */
+QTreeView::branch:hover {
+    background-color: #2e3136;
+}
+
 QTreeView::branch:selected {
-    background-color: #37373d;
+    background-color: #2e436e;
 }
 
-/* Состояние: Закрыто */
-QTreeView::branch:has-children:!has-siblings:closed,
-QTreeView::branch:closed:has-children:has-siblings {
-    image: url(:/icons/arrow-right.svg);
-}
+QTreeView::branch:has-children:closed { image: url(:/icons/arrow-right.svg); }
+QTreeView::branch:has-children:open { image: url(:/icons/arrow-down.svg); }
 
-/* Состояние: Открыто */
-QTreeView::branch:open:has-children:!has-siblings,
-QTreeView::branch:open:has-children:has-siblings {
-    image: url(:/icons/arrow-down.svg);
-}
-
-/* Убираем "белый квадрат", который вы видели */
-QTreeView::branch:open:has-children:hover,
-QTreeView::branch:closed:has-children:hover {
-    background-color: transparent; /* Было #ffffff, теперь прозрачно */
-}
-
-/* ================= Контекстное меню (QMenu) ================= */
+/* ================= Контекстное меню  ================= */
 QMenu {
     background-color: #252526;
     color: #cccccc;
     border: 1px solid #454545;
-    padding: 5px 0px;
+    padding: 4px 0px;
 }
 
 QMenu::item {
-    padding: 5px 20px 5px 20px;
+    padding: 6px 25px 6px 25px;
+    background-color: transparent;
+}
+
+/* ПОДСВЕТКА ПРИ НАВЕДЕНИИ В МЕНЮ */
+QMenu::item:selected {
+    background-color: #094771; /* Синий акцент */
+    color: #ffffff;
 }
 
 QMenu::separator {
     height: 1px;
     background-color: #454545;
-    margin: 4px 0px;
+    margin: 4px 10px;
+}
+
+/* ================= Диалоги (Тёмная тема) ================= */
+QDialog, QMessageBox, QInputDialog {
+    background-color: #1e1e1e;
+    color: #cccccc;
+}
+
+QLineEdit {
+    background-color: #2d2d2d;
+    color: #ffffff;
+    border: 1px solid #3c3c3c;
+    padding: 4px;
+    border-radius: 2px;
+}
+
+QLineEdit:focus {
+    border: 1px solid #007acc; /* Синяя рамка при вводе */
+}
+
+QPushButton {
+    background-color: #333333;
+    color: #ffffff;
+    border: 1px solid #454545;
+    padding: 5px 15px;
+    border-radius: 2px;
+}
+
+QPushButton:hover {
+    background-color: #444444;
+}
+
+/* ================= Редактор и Терминал ================= */
+QTextEdit#codeEditor, QTextEdit#terminalWidget {
+    background-color: #1e1e1e;
+    color: #d4d4d4;
+    border: none;
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 13px;
+}
+
+QTextEdit#terminalWidget {
+    border-top: 1px solid #3c3c3c;
+}
+
+QSplitter::handle {
+    background-color: #1a1a1a;
+}
+
+/* ================= Общий стиль для Скроллбаров ================= */
+
+/* Сама полоса (вертикальная) */
+QScrollBar:vertical {
+    border: none;
+    background: #1e1e1e; /* Цвет фона основного окна */
+    width: 10px;         /* Тонкий */
+    margin: 0px 0px 0px 0px;
+}
+
+/* Ползунок (то, за что тянем) */
+QScrollBar::handle:vertical {
+    background: #3e3e42; /* Темно-серый в покое */
+    min-height: 20px;
+    border-radius: 5px;  /* Закругленные края */
+    margin: 2px;         /* Отступ, чтобы казался еще тоньше */
+}
+
+/* Ползунок при наведении (подсветка) */
+QScrollBar::handle:vertical:hover {
+    background: #4e4e52;
+}
+
+/* Убираем стрелочки сверху и снизу (в современных IDE их нет) */
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+    height: 0px;
+}
+
+/* Фон под ползунком */
+QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
+    background: none;
+}
+
+/* То же самое для горизонтального скролла */
+QScrollBar:horizontal {
+    border: none;
+    background: #1e1e1e;
+    height: 10px;
+    margin: 0px;
+}
+
+QScrollBar::handle:horizontal {
+    background: #3e3e42;
+    min-width: 20px;
+    border-radius: 5px;
+    margin: 2px;
+}
+
+QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
+    width: 0px;
 }

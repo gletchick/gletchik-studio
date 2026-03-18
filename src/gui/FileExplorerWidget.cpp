@@ -28,6 +28,7 @@ namespace gs {
         m_treeView->setModel(m_fileModel);
         m_treeView->setRootIndex(m_fileModel->index(currentPath));
         m_treeView->setHeaderHidden(true);
+        m_treeView->setIndentation(12);
 
         // Прячем лишние колонки
         for (int i = 1; i < m_fileModel->columnCount(); ++i) {

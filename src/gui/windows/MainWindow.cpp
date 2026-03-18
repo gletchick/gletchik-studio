@@ -40,8 +40,9 @@ void MainWindow::setupTitleBar() {
     titleLayout->setContentsMargins(0, 0, 0, 0);
     titleLayout->setSpacing(0);
 
-    QLabel *titleLabel = new QLabel("My Application", titleBarWidget);
+    QLabel *titleLabel = new QLabel("GLETCHIK STUDIO", titleBarWidget);
     titleLabel->setObjectName("titleLabel");
+    titleLayout->setContentsMargins(0, 0, 0, 0);
 
     QPushButton *btnMinimize = new QPushButton("_", titleBarWidget);
     m_btnMaximize = new QPushButton("▢", titleBarWidget);
@@ -68,74 +69,50 @@ void MainWindow::setupTitleBar() {
     connect(btnMinimize, &QPushButton::clicked, this, &MainWindow::onBtnMinimizedClicked);
 }
 
-void MainWindow::setupCentralArea() {
+    void MainWindow::setupCentralArea() {
+    // 1. Главный горизонтальный контейнер для всего окна
+    QHBoxLayout *mainHorizontalLayout = new QHBoxLayout();
+    mainHorizontalLayout->setContentsMargins(0, 0, 0, 0);
+    mainHorizontalLayout->setSpacing(0);
+
+    // 2. Создаем Sidebar (он теперь слева от ВСЕГО)
+    Sidebar *sidebar = new Sidebar(this);
+    mainHorizontalLayout->addWidget(sidebar);
+
+    // 3. Вертикальный сплиттер (Верх: Редактор, Низ: Терминал)
     m_vSplitter = new QSplitter(Qt::Vertical, this);
     m_vSplitter->setHandleWidth(1);
-    m_vSplitter->setChildrenCollapsible(false); // ВАЖНО: Отключаем резкое схлопывание
 
-    // --- ВЕРХНЯЯ ЧАСТЬ ---
-    QWidget *upperWidget = new QWidget();
-    QHBoxLayout *upperLayout = new QHBoxLayout(upperWidget);
-    upperLayout->setContentsMargins(0, 0, 0, 0);
-    upperLayout->setSpacing(0);
-
-    Sidebar *sidebar = new Sidebar(this);
-    upperLayout->addWidget(sidebar);
-
-    m_hSplitter = new QSplitter(Qt::Horizontal, upperWidget);
+    m_hSplitter = new QSplitter(Qt::Horizontal, m_vSplitter);
     m_hSplitter->setHandleWidth(1);
-    m_hSplitter->setChildrenCollapsible(false); // ВАЖНО: Отключаем резкое схлопывание
 
     m_fileExplorer = new FileExplorerWidget();
-
-    m_codeEditor = new QTextEdit(); // Используем переменную класса
+    m_codeEditor = new QTextEdit();
     m_codeEditor->setObjectName("codeEditor");
-    m_codeEditor->setPlaceholderText("// Пишите код здесь...");
-    m_codeEditor->setMinimumWidth(100);
+    m_codeEditor->setPlaceholderText(QString::fromUtf8("Пишите код здесь..."));
 
     m_hSplitter->addWidget(m_fileExplorer);
-    m_hSplitter->addWidget(m_codeEditor); // Добавляем в сплиттер
-
-    connect(m_fileExplorer, &FileExplorerWidget::fileSelected, this, [this](const QString &path) {
-        QFile file(path);
-        if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-            m_codeEditor->setPlainText(QString::fromUtf8(file.readAll()));
-            file.close();
-        }
-    });
-
-    m_hSplitter->setStretchFactor(0, 0);
+    m_hSplitter->addWidget(m_codeEditor);
     m_hSplitter->setStretchFactor(1, 1);
 
-    upperLayout->addWidget(m_hSplitter);
-
-    // --- НИЖНЯЯ ЧАСТЬ ---
-    m_terminal = new TerminalWidget(); // <-- Наш кастомный терминал
+    m_terminal = new TerminalWidget();
     m_terminal->setObjectName("terminalWidget");
-    m_terminal->setMinimumHeight(50);
 
-    m_vSplitter->addWidget(upperWidget);
+    m_vSplitter->addWidget(m_hSplitter);
     m_vSplitter->addWidget(m_terminal);
-
     m_vSplitter->setStretchFactor(0, 1);
-    m_vSplitter->setStretchFactor(1, 0);
+
+    // Добавляем сплиттер в основной слой справа от Sidebar
+    mainHorizontalLayout->addWidget(m_vSplitter);
 
     if (ui->mainVerticalLayout) {
-        ui->mainVerticalLayout->addWidget(m_vSplitter);
+        ui->mainVerticalLayout->addLayout(mainHorizontalLayout);
     }
 
+    // Connects... (оставляем старые)
     connect(sidebar, &Sidebar::projectToggled, this, &MainWindow::onProjectToggled);
     connect(sidebar, &Sidebar::terminalToggled, this, &MainWindow::onTerminalToggled);
-
     connect(sidebar, &Sidebar::runClicked, this, &MainWindow::onRunClicked);
-
-    // Связываем ввод пользователя с отправкой в процесс
-    connect(m_terminal, &TerminalWidget::inputReady, this, &MainWindow::onTerminalInput);
-
-    // Запускаем таймер для чтения очереди ThreadSafeQueue
-    m_updateTimer = new QTimer(this);
-    connect(m_updateTimer, &QTimer::timeout, this, &MainWindow::processOutputQueue);
-    m_updateTimer->start(50); // Проверяем очередь каждые 50 мс
 }
 
 void MainWindow::onProjectToggled(bool checked) {

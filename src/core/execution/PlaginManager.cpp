@@ -2,10 +2,14 @@
 #include <dlfcn.h>
 #include <iostream>
 #include <filesystem>
+#include <mutex>
 
 namespace fs = std::filesystem;
 
 namespace gs {
+
+    std::unordered_map<std::string, std::shared_ptr<ILanguageProvider>> PluginManager::m_providersMap;
+    std::shared_mutex PluginManager::m_mapMutex;
 
     typedef ILanguageProvider* (*CreateProviderFunc)(IProcess*);
 
@@ -49,16 +53,31 @@ namespace gs {
             return providers;
         }
 
+        std::unique_lock<std::shared_mutex> lock(m_mapMutex);
+
         for (const auto& entry : fs::directory_iterator(dirPath)) {
             if (entry.path().extension() == ".so") {
                 auto p = loadPlugin(entry.path().string(), process);
                 if (p) {
                     std::cout << "[PluginManager] Successfully loaded: " << entry.path().filename() << std::endl;
                     providers.push_back(p);
+
+                    for (const std::string& ext : p->getSupportedExtensions()) {
+                        m_providersMap[ext] = p;
+                    }
                 }
             }
         }
         return providers;
+    }
+
+    std::shared_ptr<ILanguageProvider> PluginManager::getProviderByExtension(const std::string& extension) {
+        std::shared_lock<std::shared_mutex> lock(m_mapMutex);
+        auto it = m_providersMap.find(extension);
+        if (it != m_providersMap.end()) {
+            return it->second;
+        }
+        return nullptr;
     }
 
 } // namespace gs

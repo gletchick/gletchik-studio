@@ -17,7 +17,6 @@ set(CMAKE_AUTOUIC_SEARCH_PATHS
 # Группируем файлы для удобства
 set(CORE_SOURCES
         # Interfaces
-        sdk/steptype.h
         sdk/iprocess.h
         sdk/ibuildstep.h
         include/core/execution/isteprunner.h
@@ -52,6 +51,13 @@ set(CORE_SOURCES
         src/gui/windows/BaseWindow.cpp
         include/gui/windows/startwindow.h
         src/gui/windows/StartWindow.cpp
+        src/core/languages/java/JavaLanguageProviderr.cpp
+        include/core/project/projectmanager.h
+        src/core/project/ProjectManager.cpp
+        include/core/project/filemanager.h
+        include/core/utils/utils.h
+        src/core/utils/utils.cpp
+        src/core/project/FileManager.cpp
 )
 
 add_executable(gletchik-studio

@@ -7,13 +7,11 @@
 
 namespace gs {
 
-    class JavaLanguageProvider : public ILanguageProvider, public ISyntaxProvider {
+    class JavaLanguageProvider : public ILanguageProvider {
     public:
         explicit JavaLanguageProvider(std::shared_ptr<IProcess> process);
 
         std::string languageName() const override;
-
-        std::vector<HighlightRule> getSyntaxRules() const override;
 
         std::vector<std::shared_ptr<IBuildStep>> getBuildPipeline(
             const std::string& projectPath,

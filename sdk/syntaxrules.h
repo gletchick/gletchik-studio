@@ -4,13 +4,21 @@
 
 namespace gs {
 
-    enum class TextStyle {
-        Keyword, Type, String, Comment, Number
+    enum class TokenType {
+        Keyword,
+        Type,
+        String,
+        Comment,
+        Number,
+        Identifier,
+        ProjectClass,
+        ProjectMethod,
+        ProjectField
     };
 
     struct HighlightRule {
         std::string regexPattern;
-        TextStyle style;
+        TokenType style;
     };
 
     class ISyntaxProvider {

@@ -2,6 +2,7 @@
 
 #include <string>
 #include <memory>
+#include <shared_mutex>
 #include <vector>
 #include "../../../sdk/ilanguageprovider.h"
 #include "../../../sdk/iprocess.h"
@@ -15,6 +16,12 @@ namespace gs {
 
         static std::vector<std::shared_ptr<ILanguageProvider>> loadAllFromDir(const std::string& dirPath,
                                                                              std::shared_ptr<IProcess> process);
+
+        static std::shared_ptr<ILanguageProvider> getProviderByExtension(const std::string& extension);
+
+    private:
+        static std::unordered_map<std::string, std::shared_ptr<ILanguageProvider>> m_providersMap;
+        static std::shared_mutex m_mapMutex;
     };
 
 } // namespace gs

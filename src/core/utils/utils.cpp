@@ -1,4 +1,3 @@
-#include "utils.h"
 #include <QFile>
 #include <QCryptographicHash>
 

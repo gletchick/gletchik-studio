@@ -1,6 +1,5 @@
 #pragma once
 #include <string>
-#include "../../../sdk/steptype.h"
 #include "sdk/ibuildstep.h"
 
 namespace gs {

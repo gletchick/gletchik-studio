@@ -16,6 +16,10 @@ namespace gs {
         ProjectField
     };
 
+    inline uint qHash(TokenType key, uint seed) {
+        return ::qHash(static_cast<uint>(key), seed);
+    }
+
     struct HighlightRule {
         std::string regexPattern;
         TokenType style;

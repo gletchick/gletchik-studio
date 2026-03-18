@@ -3,8 +3,6 @@
 #include "../../../../sdk/iprocess.h"
 #include <memory>
 
-#include "sdk/syntaxrules.h"
-
 namespace gs {
 
     class JavaLanguageProvider : public ILanguageProvider {
@@ -16,6 +14,10 @@ namespace gs {
         std::vector<std::shared_ptr<IBuildStep>> getBuildPipeline(
             const std::string& projectPath,
             const std::string& className) override;
+
+        std::vector<std::string> getSupportedExtensions() const override;
+        QJsonObject parseFile(const QString& filePath, const QString& content) override;
+        std::shared_ptr<ISyntaxProvider> getSyntaxProvider() override;
 
     private:
         std::shared_ptr<IProcess> m_process;

@@ -54,4 +54,18 @@ namespace gs {
         return pipeline;
     }
 
+    std::vector<std::string> JavaLanguageProvider::getSupportedExtensions() const {
+        return { ".java" };
+    }
+
+    QJsonObject JavaLanguageProvider::parseFile(const QString& filePath, const QString& content) {
+        // Пока возвращаем пустой объект, если парсер еще не готов
+        return QJsonObject();
+    }
+
+    std::shared_ptr<ISyntaxProvider> JavaLanguageProvider::getSyntaxProvider() {
+        // Позже здесь будешь возвращать объект с правилами подсветки
+        return nullptr;
+    }
+
 } // namespace gs

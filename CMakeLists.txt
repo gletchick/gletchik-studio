@@ -58,6 +58,11 @@ set(CORE_SOURCES
         include/core/utils/utils.h
         src/core/utils/utils.cpp
         src/core/project/FileManager.cpp
+        include/core/syntaxanaliz/wordanalyzier.h
+        src/core/syntaxanaliz/WordAnalyzier.cpp
+        include/ui/gshighlighter.h
+        src/ui/GSHighlighter.cpp
+        sdk/steptype.h
 )
 
 add_executable(gletchik-studio

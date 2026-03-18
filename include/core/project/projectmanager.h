@@ -6,6 +6,8 @@
 #include <QMutex>
 #include <QSet>
 
+#include "sdk/syntaxrules.h"
+
 namespace gs {
     class ProjectManager {
     public:
@@ -14,6 +16,7 @@ namespace gs {
         ProjectManager(const ProjectManager&) = delete;
         ProjectManager& operator=(const ProjectManager&) = delete;
 
+        bool createProject(const QString &path);
         bool openProject(const QString &path);
         void saveProject();
 

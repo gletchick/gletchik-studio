@@ -48,6 +48,10 @@ set(CORE_SOURCES
         src/gui/FileExplorerWidget.cpp
         include/gui/customiconprovider.h
         src/gui/CustomIconProvider.cpp
+        include/gui/windows/basewindow.h
+        src/gui/windows/BaseWindow.cpp
+        include/gui/windows/startwindow.h
+        src/gui/windows/StartWindow.cpp
 )
 
 add_executable(gletchik-studio

@@ -18,6 +18,7 @@ namespace gs {
 
         bool createProject(const QString &path);
         bool openProject(const QString &path);
+        bool cloneFromVCS(const QString &url, const QString &path);
         void saveProject();
 
         QJsonObject getIndex();
@@ -47,4 +48,5 @@ namespace gs {
         const QString configDirName = ".gs";
         const QString indexFileName = "project_index.json";
     };
+
 }

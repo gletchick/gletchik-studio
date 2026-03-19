@@ -40,7 +40,6 @@ set(CORE_SOURCES
         sdk/syntaxrules.h
         include/core/utils/threadsafequeue.h
         src/core/utils/threadsafequeue.cpp
-        src/core/languages/java/JavaLanguageProvider.cpp
         include/gui/terminalwidget.h
         src/gui/TerminalWidget.cpp
         include/gui/fileexplorerwidget.h
@@ -51,7 +50,7 @@ set(CORE_SOURCES
         src/gui/windows/BaseWindow.cpp
         include/gui/windows/startwindow.h
         src/gui/windows/StartWindow.cpp
-        src/core/languages/java/JavaLanguageProviderr.cpp
+        src/core/languages/java/JavaLanguageProvider.cpp
         include/core/project/projectmanager.h
         src/core/project/ProjectManager.cpp
         include/core/project/filemanager.h

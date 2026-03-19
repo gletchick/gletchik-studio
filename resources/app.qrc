@@ -9,5 +9,6 @@
         <file>icons/settings.svg</file>
         <file>icons/create-project.svg</file>
         <file>icons/project-from-git.svg</file>
+        <file>icons/open-project.svg</file>
     </qresource>
 </RCC>

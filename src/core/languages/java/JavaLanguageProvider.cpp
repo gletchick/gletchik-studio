@@ -13,10 +13,6 @@ namespace gs {
     JavaLanguageProvider::JavaLanguageProvider(std::shared_ptr<IProcess> process)
         : m_process(std::move(process)) {}
 
-    std::string JavaLanguageProvider::languageName() const {
-        return "Java";
-    }
-
     std::vector<std::shared_ptr<IBuildStep>> JavaLanguageProvider::getBuildPipeline(
     const std::string& projectPath,
     const std::string& sourceFilePath) {
@@ -54,15 +50,20 @@ namespace gs {
         return pipeline;
     }
 
-    std::vector<HighlightRule> JavaLanguageProvider::getSyntaxRules() const {
-        static const std::vector<HighlightRule> rules = {
-            {"\\b(abstract|assert|boolean|break|byte|case|catch|char|class|const|continue|default|do|double|else|enum|extends|final|finally|float|for|goto|if|implements|import|instanceof|int|interface|long|native|new|package|private|protected|public|return|short|static|strictfp|super|switch|synchronized|this|throw|throws|transient|try|void|volatile|while)\\b", TextStyle::Keyword},
-            {"\\b[A-Z][a-zA-Z0-9_]*\\b", TextStyle::Type},
-            {"\"([^\\\\\"]|\\\\.)*\"", TextStyle::String},
-            {"//.*|/\\*[\\s\\S]*?\\*/", TextStyle::Comment},
-            {"\\b\\d+(\\.\\d+)?([eE][+-]?\\d+)?[fFdDL]?\\b", TextStyle::Number}
-        };
-        return rules;
+    std::string JavaLanguageProvider::languageName() const {
+        return "Java";
+    }
+
+    std::vector<std::string> JavaLanguageProvider::getSupportedExtensions() const {
+        return { ".java" };
+    }
+
+    QJsonObject JavaLanguageProvider::parseFile(const QString& filePath, const QString& content) {
+        return QJsonObject();
+    }
+
+    std::shared_ptr<ISyntaxProvider> JavaLanguageProvider::getSyntaxProvider() {
+        return nullptr;
     }
 
 } // namespace gs

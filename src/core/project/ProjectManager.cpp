@@ -1,12 +1,17 @@
 #include <QDir>
 #include <QFile>
 #include <QJsonArray>
-#include <QJsonParseError>
 #include <QDebug>
+#include <QJsonDocument>
 
 #include "core/project/projectmanager.h"
 
 namespace gs {
+
+    ProjectManager& ProjectManager::instance() {
+        static ProjectManager inst;
+        return inst;
+    }
 
     bool ProjectManager::createProject(const QString &path) {
         QMutexLocker dataLocker(&m_dataMutex);
@@ -87,7 +92,6 @@ namespace gs {
     }
 
     void ProjectManager::saveProject() {
-        // Порядок захвата мьютексов теперь строго совпадает с openProject
         QMutexLocker dataLocker(&m_dataMutex);
         QReadLocker indexLocker(&m_indexLock);
 
@@ -102,6 +106,68 @@ namespace gs {
             file.close();
         } else {
             qWarning() << "Failed to open index file for writing:" << fullPath;
+        }
+    }
+
+    bool ProjectManager::cloneFromVCS(const QString &url, const QString &path) {
+        qDebug() << "Cloning project from" << url << "to" << path;
+        // Пустая реализация для курсового проекта
+        return true;
+    }
+
+    QJsonObject ProjectManager::getIndex() {
+        QReadLocker indexLocker(&m_indexLock);
+        return m_projectIndex;
+    }
+
+    void ProjectManager::updateIndex(const QJsonObject &newIndex) {
+        QWriteLocker indexLocker(&m_indexLock);
+        m_projectIndex = newIndex;
+        rebuildSemanticCache();
+    }
+
+    void ProjectManager::reindexAll() {
+        // Заготовка для полного обхода файлов проекта
+    }
+
+    QString ProjectManager::getProjectRoot() const {
+        QMutexLocker dataLocker(&m_dataMutex);
+        return m_projectPath;
+    }
+
+    TokenType ProjectManager::getSemanticType(const QString &identifier) const {
+        QReadLocker indexLocker(&m_indexLock);
+
+        if (m_cachedClasses.contains(identifier)) {
+            return TokenType::Keyword; // Временный фоллбэк, сверь с syntaxrules.h
+        }
+        if (m_cachedMethods.contains(identifier)) {
+            return TokenType::Identifier; // Временный фоллбэк, сверь с syntaxrules.h
+        }
+
+        return TokenType::Identifier;
+    }
+
+    void ProjectManager::processFile(const QString &filePath) {
+        Q_UNUSED(filePath);
+        // Заготовка для интеграции с парсером (обновление индекса по файлу)
+    }
+
+    void ProjectManager::rebuildSemanticCache() {
+        // Блокировка не нужна, так как метод вызывается уже из-под QWriteLocker
+        m_cachedClasses.clear();
+        m_cachedMethods.clear();
+
+        QJsonObject indexMap = m_projectIndex["index"].toObject();
+
+        QJsonArray classesArray = indexMap["classes"].toArray();
+        for (const QJsonValue &val : classesArray) {
+            m_cachedClasses.insert(val.toString());
+        }
+
+        QJsonArray methodsArray = indexMap["methods"].toArray();
+        for (const QJsonValue &val : methodsArray) {
+            m_cachedMethods.insert(val.toString());
         }
     }
 

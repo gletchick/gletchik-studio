@@ -17,7 +17,10 @@ namespace gs {
 
     private:
         void createActionButtons(QWidget *container, QLayout *layout);
-        QWidget* createLargeButton(const QString &iconPath, const QString &text, QWidget *parent);
+        QWidget* createLargeButton(const QString &iconPath,
+                                         const QString &text,
+                                         QWidget *parent,
+                                         std::function<void()> onClick);
     };
 
 } // namespace gs

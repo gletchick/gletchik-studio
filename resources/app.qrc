@@ -6,5 +6,8 @@
         <file>icons/arrow-down.svg</file>
         <file>icons/arrow-right.svg</file>
         <file>icons/run.svg</file>
+        <file>icons/settings.svg</file>
+        <file>icons/create-project.svg</file>
+        <file>icons/project-from-git.svg</file>
     </qresource>
 </RCC>

@@ -2,7 +2,6 @@
 
 #include "basewindow.h"
 #include <QPushButton>
-#include <QVBoxLayout>
 
 namespace gs {
 
@@ -18,7 +17,7 @@ namespace gs {
 
     private:
         void createActionButtons(QWidget *container, QLayout *layout);
-        QPushButton* createLargeButton(const QString &text, const QString &subText, QWidget *parent);
+        QWidget* createLargeButton(const QString &iconPath, const QString &text, QWidget *parent);
     };
 
 } // namespace gs

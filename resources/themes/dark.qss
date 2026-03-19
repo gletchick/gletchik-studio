@@ -236,3 +236,69 @@ QScrollBar::handle:horizontal {
 QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
     width: 0px;
 }
+
+/* ================= Стартовый экран (StartWindow) ================= */
+
+QWidget#startWorkspace {
+    background-color: #1e1e1e;
+}
+
+QLabel#welcomeTitle {
+    color: #ffffff;
+    font-size: 32px;
+    font-weight: 600;
+    letter-spacing: 1px;
+}
+
+QLabel#welcomeDesc {
+    color: #888888;
+    font-size: 15px;
+    margin-top: 5px;
+}
+
+QLabel#tileLabel {
+    color: #dedede;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+/* Стили плиток-кнопок */
+QPushButton#actionTile {
+    background-color: #2b2d30;
+    border: 2px solid #3c3f41;
+    border-radius: 7px; /* Более скругленные */
+    outline: none;
+}
+
+QPushButton#actionTile:hover {
+    background-color: #2b2d30;
+    border: 2px solid #32cd32;
+    qproperty-iconSize: 42px;
+}
+
+QPushButton#actionTile:pressed {
+    background-color: #202225;
+}
+
+/* Кнопка настроек внизу */
+QPushButton#btnSettings {
+    background-color: transparent; /* Полностью прозрачная в покое */
+    border: none;
+    border-radius: 20px; /* Делаем идеальный круг для ховера */
+    /* Убираем стандартную рамку фокуса, чтобы не было пунктира */
+    outline: none;
+}
+
+QPushButton#btnSettings:hover {
+    /* Используем легкое осветление вместо чистого белого,
+       чтобы сохранить общую темную палитру */
+    background-color: #3c3c3c;
+}
+
+QPushButton#btnSettings:pressed {
+    /* При нажатии чуть затемняем, создавая эффект глубины */
+    background-color: #2d2d2d;
+}
+
+/* Если иконка кажется слишком тусклой, можно добавить стиль для неё (через QIcon)
+   Но обычно достаточно того, что фон под ней меняется */

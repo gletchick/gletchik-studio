@@ -2,6 +2,7 @@
 #include <QApplication>
 
 #include "gui/windows/mainwindow.h"
+#include "gui/windows/startwindow.h"
 
 void loadStyleSheet(const QString& path) {
     QFile file(path);
@@ -16,7 +17,7 @@ int main(int argc, char *argv[]) {
 
     loadStyleSheet(":/themes/dark.qss");
 
-    gs::MainWindow w;
+    gs::StartWindow w;
     w.show();
     return a.exec();
 }

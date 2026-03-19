@@ -1,4 +1,7 @@
 #include <QLabel>
+#include <QVBoxLayout>
+#include <QHBoxLayout>
+#include <QIcon>
 
 #include "gui/windows/startwindow.h"
 
@@ -9,90 +12,98 @@ StartWindow::StartWindow(QWidget *parent)
     setObjectName("StartWindow");
     resize(850, 550);
 
-    setupBaseWindow("Welcome to IntelliJ IDEA");
+    setupBaseWindow("Gletchick Studio IDE");
 }
 
 void StartWindow::setupWorkspace(QWidget *contentWidget) {
+    contentWidget->setObjectName("startWorkspace");
     QVBoxLayout *mainLayout = new QVBoxLayout(contentWidget);
-    mainLayout->setContentsMargins(0, 0, 0, 20);
+    mainLayout->setContentsMargins(0, 0, 0, 0);
     mainLayout->setSpacing(0);
 
-    // Центральная область с приветствием и кнопками
+    // Центрирующий контейнер
     QWidget *centerContainer = new QWidget(contentWidget);
     QVBoxLayout *centerLayout = new QVBoxLayout(centerContainer);
-    centerLayout->setContentsMargins(50, 0, 50, 0);
-    centerLayout->addStretch(1);
+    centerLayout->setContentsMargins(50, 20, 50, 0);
+    centerLayout->addStretch(2);
 
-    QLabel *titleLabel = new QLabel("Welcome to IntelliJ IDEA", centerContainer);
+    QLabel *titleLabel = new QLabel("Welcome to Gletchick Studio", centerContainer);
+    titleLabel->setObjectName("welcomeTitle");
     titleLabel->setAlignment(Qt::AlignCenter);
-    titleLabel->setStyleSheet("font-size: 32px; font-weight: 500; margin-bottom: 10px;");
     centerLayout->addWidget(titleLabel);
 
-    QLabel *descLabel = new QLabel("Create a new project to start from scratch.\nOpen existing project from disk or version control.", centerContainer);
+    QLabel *descLabel = new QLabel("The next generation of coding experience.", centerContainer);
+    descLabel->setObjectName("welcomeDesc");
     descLabel->setAlignment(Qt::AlignCenter);
-    descLabel->setStyleSheet("color: #808080; font-size: 14px; margin-bottom: 40px;");
     centerLayout->addWidget(descLabel);
 
+    centerLayout->addSpacing(50);
+
+    // Ряд с кнопками
     QHBoxLayout *actionsLayout = new QHBoxLayout();
-    actionsLayout->setSpacing(20);
+    actionsLayout->setSpacing(30);
     actionsLayout->addStretch(1);
     createActionButtons(centerContainer, actionsLayout);
     actionsLayout->addStretch(1);
-    
+
     centerLayout->addLayout(actionsLayout);
-    centerLayout->addStretch(2);
+    centerLayout->addStretch(3);
 
     mainLayout->addWidget(centerContainer, 1);
 
-    // Нижняя панель с перенесенной кнопкой настроек
-    QHBoxLayout *bottomLayout = new QHBoxLayout();
-    bottomLayout->setContentsMargins(20, 0, 20, 0);
+    // Нижняя панель с шестеренкой слева
+    QWidget *bottomBar = new QWidget(contentWidget);
+    bottomBar->setFixedHeight(60);
+    QHBoxLayout *bottomLayout = new QHBoxLayout(bottomBar);
+    bottomLayout->setContentsMargins(20, 0, 20, 15);
 
-    QPushButton *btnSettings = new QPushButton("⚙", contentWidget);
-    btnSettings->setFixedSize(32, 32);
+    QPushButton *btnSettings = new QPushButton(bottomBar);
+    btnSettings->setIcon(QIcon(":/icons/settings.svg"));
+    btnSettings->setIconSize(QSize(24, 24));
+    btnSettings->setFixedSize(40, 40);
     btnSettings->setObjectName("btnSettings");
     btnSettings->setCursor(Qt::PointingHandCursor);
 
-    // Смещаем кнопку согласно стрелке (например, в центр или чуть правее центра)
-    bottomLayout->addStretch(1); 
-    bottomLayout->addWidget(btnSettings);
+    bottomLayout->addWidget(btnSettings); // Добавляем первым (слева)
     bottomLayout->addStretch(1);
 
-    mainLayout->addLayout(bottomLayout);
+    mainLayout->addWidget(bottomBar);
 }
 
 void StartWindow::createActionButtons(QWidget *container, QLayout *layout) {
-    QPushButton *btnNew = createLargeButton("+", "New Project", container);
-    QPushButton *btnOpen = createLargeButton("📁", "Open", container);
-    QPushButton *btnVCS = createLargeButton("🌿", "Clone Repository", container);
-
-    layout->addWidget(btnNew);
-    layout->addWidget(btnOpen);
-    layout->addWidget(btnVCS);
+    layout->addWidget(createLargeButton(":/icons/create-project.svg", "New Project", container));
+    layout->addWidget(createLargeButton(":/icons/project.svg", "Open Project", container));
+    layout->addWidget(createLargeButton(":/icons/project-from-git.svg", "Get from VCS", container));
 }
 
-QPushButton* StartWindow::createLargeButton(const QString &icon, const QString &text, QWidget *parent) {
-    QPushButton *btn = new QPushButton(parent);
-    btn->setObjectName("actionTile");
-    btn->setFixedSize(140, 120);
+    QWidget* gs::StartWindow::createLargeButton(const QString &iconPath, const QString &text, QWidget *parent) {
+    // Основной контейнер для вертикального стека (Кнопка + Текст)
+    QWidget *tileContainer = new QWidget(parent);
+    QVBoxLayout *tileLayout = new QVBoxLayout(tileContainer);
+    tileLayout->setContentsMargins(0, 0, 0, 0);
+    tileLayout->setSpacing(12);
+    tileLayout->setAlignment(Qt::AlignCenter);
 
+    // Сама кнопка
+    QPushButton *btn = new QPushButton(tileContainer);
+    btn->setObjectName("actionTile");
+    btn->setFixedSize(63, 63);
+    btn->setIcon(QIcon(iconPath));
+    btn->setIconSize(QSize(33, 33));
     btn->setCursor(Qt::PointingHandCursor);
-    
-    QVBoxLayout *btnLayout = new QVBoxLayout(btn);
-    
-    QLabel *iconLabel = new QLabel(icon, btn);
-    iconLabel->setAlignment(Qt::AlignCenter);
-    iconLabel->setStyleSheet("font-size: 24px; border: none; background: transparent;");
-    
-    QLabel *textLabel = new QLabel(text, btn);
+
+    // Подпись под кнопкой
+    QLabel *textLabel = new QLabel(text, tileContainer);
+    textLabel->setObjectName("tileLabel");
     textLabel->setAlignment(Qt::AlignCenter);
     textLabel->setWordWrap(true);
-    textLabel->setStyleSheet("font-size: 12px; border: none; background: transparent;");
+    // Ограничиваем ширину текста шириной кнопки, чтобы layout не раздувало
+    textLabel->setFixedWidth(100);
 
-    btnLayout->addWidget(iconLabel);
-    btnLayout->addWidget(textLabel);
-    
-    return btn;
+    tileLayout->addWidget(btn, 0, Qt::AlignCenter);
+    tileLayout->addWidget(textLabel, 0, Qt::AlignCenter);
+
+    return tileContainer;
 }
 
 } // namespace gs

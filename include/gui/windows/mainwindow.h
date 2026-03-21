@@ -4,6 +4,8 @@
 #include <QSplitter>
 #include <QTextEdit>
 
+#include "gui/fileexplorerwidget.h"
+
 namespace Ui {
     class MainWindow;
 }
@@ -17,6 +19,8 @@ namespace gs {
         explicit MainWindow(QWidget *parent = nullptr);
         ~MainWindow() override;
 
+        void loadProject(const QString &path);
+
     protected:
         void setupWorkspace(QWidget *contentWidget) override;
 
@@ -27,10 +31,12 @@ namespace gs {
     private:
         Ui::MainWindow *ui;
 
-        QWidget *m_fileExplorer;
+        FileExplorerWidget *m_fileExplorer;
         QTextEdit *m_terminal;
         QSplitter *m_hSplitter;
         QSplitter *m_vSplitter;
+
+        void onOpenProjectTriggered();
     };
 
 } // namespace gs

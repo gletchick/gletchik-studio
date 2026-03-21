@@ -83,10 +83,9 @@ namespace gs {
             if (!dir.isEmpty()) {
                 // Если менеджер успешно создал проект
                 if (ProjectManager::instance().createProject(dir)) {
-                    // Создаем и открываем окно редактора
                     MainWindow *mainWin = new MainWindow();
+                    mainWin->loadProject(dir);
                     mainWin->show();
-                    // Закрываем текущее стартовое окно
                     this->close();
                 }
             }
@@ -101,6 +100,7 @@ namespace gs {
                 // Если менеджер успешно нашел и открыл проект
                 if (ProjectManager::instance().openProject(dir)) {
                     MainWindow *mainWin = new MainWindow();
+                    mainWin->loadProject(dir);
                     mainWin->show();
                     this->close();
                 }

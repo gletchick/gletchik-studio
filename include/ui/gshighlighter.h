@@ -14,7 +14,6 @@ namespace gs {
     private:
         std::shared_ptr<WordAnalyzier> m_analyzer;
         
-        // Мапа для хранения стилей (цвет, жирность) для каждого типа токена
         QHash<TokenType, QTextCharFormat> m_formats;
         void setupFormats();
     };

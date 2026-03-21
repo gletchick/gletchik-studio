@@ -15,12 +15,12 @@ namespace gs {
         explicit FileExplorerWidget(QWidget *parent = nullptr);
         void setRootPath(const QString &path);
 
-        signals:
-            // Сигнал, который пошлет путь к файлу в MainWindow
-            void fileSelected(const QString &filePath);
+    signals:
+        void fileSelected(const QString &filePath);
 
     private slots:
         void showContextMenu(const QPoint &pos);
+        void onDoubleClicked(const QModelIndex &index);
 
     private:
         QTreeView *m_treeView;

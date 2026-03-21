@@ -2,6 +2,7 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QIcon>
+#include <QFileDialog>
 
 #include "core/project/projectmanager.h"
 #include "gui/windows/startwindow.h"
@@ -72,17 +73,32 @@ namespace gs {
     }
 
     void StartWindow::createActionButtons(QWidget *container, QLayout *layout) {
-        // Привязываем действия ProjectManager через лямбды
 
-        layout->addWidget(createLargeButton(":/icons/create-project.svg", "New Project", container, []() {
-            // В будущем здесь будет вызов диалога выбора папки
-            ProjectManager::instance().createProject("/path/to/new/project");
+        // 1. СВЯЗЫВАЕМ КНОПКУ NEW PROJECT
+        layout->addWidget(createLargeButton(":/icons/create-project.svg", "New Project", container, [this]() {
+            // Вызываем окно выбора папки
+            QString dir = QFileDialog::getExistingDirectory(this, "Select Directory for New Project",
+                                                             QDir::homePath(),
+                                                             QFileDialog::ShowDirsOnly);
+            // ПЕРЕДАЕМ ПУТЬ В МЕТОД ДРУГА
+            if (!dir.isEmpty()) {
+                ProjectManager::instance().createProject(dir);
+            }
         }));
 
-        layout->addWidget(createLargeButton(":/icons/open-project.svg", "Open Project", container, []() {
-            ProjectManager::instance().openProject("/path/to/existing/project");
+        // 2. СВЯЗЫВАЕМ КНОПКУ OPEN PROJECT
+        layout->addWidget(createLargeButton(":/icons/open-project.svg", "Open Project", container, [this]() {
+            // Вызываем окно выбора папки
+            QString dir = QFileDialog::getExistingDirectory(this, "Open Project",
+                                                             QDir::homePath(),
+                                                             QFileDialog::ShowDirsOnly);
+            // ПЕРЕДАЕМ ПУТЬ В МЕТОД ДРУГА
+            if (!dir.isEmpty()) {
+                ProjectManager::instance().openProject(dir);
+            }
         }));
 
+        // Эту кнопку пока не трогаем (как друг и просил)
         layout->addWidget(createLargeButton(":/icons/project-from-git.svg", "Get from VCS", container, []() {
             ProjectManager::instance().cloneFromVCS("https://github.com/user/repo.git", "/target/path");
         }));

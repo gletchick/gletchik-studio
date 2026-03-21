@@ -3,6 +3,7 @@
 #include <QHBoxLayout>
 #include <QIcon>
 #include <QFileDialog>
+#include "gui/windows/mainwindow.h"
 
 #include "core/project/projectmanager.h"
 #include "gui/windows/startwindow.h"
@@ -74,27 +75,35 @@ namespace gs {
 
     void StartWindow::createActionButtons(QWidget *container, QLayout *layout) {
 
-        // 1. СВЯЗЫВАЕМ КНОПКУ NEW PROJECT
+        // 1. NEW PROJECT
         layout->addWidget(createLargeButton(":/icons/create-project.svg", "New Project", container, [this]() {
-            // Вызываем окно выбора папки
             QString dir = QFileDialog::getExistingDirectory(this, "Select Directory for New Project",
                                                              QDir::homePath(),
                                                              QFileDialog::ShowDirsOnly);
-            // ПЕРЕДАЕМ ПУТЬ В МЕТОД ДРУГА
             if (!dir.isEmpty()) {
-                ProjectManager::instance().createProject(dir);
+                // Если менеджер успешно создал проект
+                if (ProjectManager::instance().createProject(dir)) {
+                    // Создаем и открываем окно редактора
+                    MainWindow *mainWin = new MainWindow();
+                    mainWin->show();
+                    // Закрываем текущее стартовое окно
+                    this->close();
+                }
             }
         }));
 
-        // 2. СВЯЗЫВАЕМ КНОПКУ OPEN PROJECT
+        // 2. OPEN PROJECT
         layout->addWidget(createLargeButton(":/icons/open-project.svg", "Open Project", container, [this]() {
-            // Вызываем окно выбора папки
             QString dir = QFileDialog::getExistingDirectory(this, "Open Project",
                                                              QDir::homePath(),
                                                              QFileDialog::ShowDirsOnly);
-            // ПЕРЕДАЕМ ПУТЬ В МЕТОД ДРУГА
             if (!dir.isEmpty()) {
-                ProjectManager::instance().openProject(dir);
+                // Если менеджер успешно нашел и открыл проект
+                if (ProjectManager::instance().openProject(dir)) {
+                    MainWindow *mainWin = new MainWindow();
+                    mainWin->show();
+                    this->close();
+                }
             }
         }));
 

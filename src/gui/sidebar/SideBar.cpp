@@ -2,7 +2,6 @@
 
 namespace gs {
 
-    // sidebar.cpp
     Sidebar::Sidebar(QWidget *parent) : QWidget(parent) {
         setFixedWidth(38); // Уменьшаем ширину сайдбара
         setObjectName("leftSidebar");

@@ -116,4 +116,16 @@ namespace gs {
         return instance;
     }
 
+    bool JavaLanguageProvider::isRunnable(const std::string& filePath, const std::string& content) const {
+        if (!QString::fromStdString(filePath).endsWith(".java")) {
+            return false;
+        }
+
+        static const QRegularExpression mainRegex(
+            "public\\s+static\\s+void\\s+main\\s*\\(\\s*String\\s*(\\[\\s*\\]\\s*\\w+|\\w+\\s*\\[\\s*\\])\\s*\\)"
+        );
+
+        return mainRegex.match(QString::fromStdString(content)).hasMatch();
+    }
+
 } // namespace gs

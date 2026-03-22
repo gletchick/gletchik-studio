@@ -20,6 +20,7 @@ namespace gs {
         virtual std::vector<std::string> getSupportedExtensions() const = 0;
         virtual QJsonObject parseFile(const QString& filePath, const QString& content) = 0;
         virtual std::shared_ptr<ISyntaxProvider> getSyntaxProvider() = 0;
+        virtual bool isRunnable(const std::string& filePath, const std::string& content) const = 0;
     };
 
 } // namespace gs

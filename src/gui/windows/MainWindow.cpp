@@ -4,12 +4,19 @@
 #include "gui/fileview.h"
 #include "core/project/projectmanager.h"
 #include "gui/sidebar/sidebar.h"
+#include "core/languages/java/javalanguageprovider.h"
 
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QSplitter>
 #include <QHBoxLayout>
-#include <QDebug>
+#include <QTimer>
+#include <QFileInfo>
+#include <QMetaObject>
+#include <thread>
+
+#include "core/languages/java/javabuildbontroller.h"
+#include "gui/terminalwidget.h"
 
 namespace {
     constexpr int SPLITTER_HANDLE_WIDTH = 1;
@@ -20,6 +27,12 @@ namespace {
 
     const QString WINDOW_TITLE = "Gletchik Studio";
     const QString TERMINAL_PLACEHOLDER = "Terminal >_";
+
+    const QString MSG_ERR_OPEN_FILE = "Could not open file:\n";
+    const QString MSG_ERR_NOT_PROJECT = "Selected directory is not a valid project.";
+    const QString MSG_NO_FILE_OPENED = "No file opened to run.\n";
+    const QString MSG_FILE_NOT_RUNNABLE = "Current file is not runnable (missing main method).\n";
+    const QString MSG_BUILD_STARTING = "Starting build process...\n";
 }
 
 namespace gs {
@@ -48,7 +61,9 @@ namespace gs {
     void MainWindow::setupWorkspace(QWidget *contentWidget) {
         ui->setupUi(contentWidget);
 
-        // 1. Инициализация сплиттеров
+        m_buildController = std::make_shared<JavaBuildController>();
+        m_javaProvider = std::make_shared<JavaLanguageProvider>(nullptr);
+
         m_vSplitter = new QSplitter(Qt::Vertical, contentWidget);
         m_vSplitter->setHandleWidth(SPLITTER_HANDLE_WIDTH);
         m_vSplitter->setChildrenCollapsible(false);
@@ -65,10 +80,8 @@ namespace gs {
         m_hSplitter->setHandleWidth(SPLITTER_HANDLE_WIDTH);
         m_hSplitter->setChildrenCollapsible(false);
 
-        // 2. Инициализация компонентов
         m_fileExplorer = new FileExplorerWidget(upperWidget);
 
-        // Создаем наш FileView
         m_editor = new FileView(upperWidget);
         m_editor->setObjectName("codeEditor");
         m_editor->setMinimumWidth(EDITOR_MIN_WIDTH);
@@ -80,7 +93,7 @@ namespace gs {
 
         upperLayout->addWidget(m_hSplitter);
 
-        m_terminal = new QTextEdit(contentWidget);
+        m_terminal = new TerminalWidget(contentWidget);
         m_terminal->setObjectName("terminalWidget");
         m_terminal->setPlaceholderText(TERMINAL_PLACEHOLDER);
         m_terminal->setMinimumHeight(TERMINAL_MIN_HEIGHT);
@@ -94,27 +107,86 @@ namespace gs {
             ui->mainVerticalLayout->addWidget(m_vSplitter);
         }
 
-        // --- ЛОГИКА АВТОСОХРАНЕНИЯ И ПЕРЕКЛЮЧЕНИЯ ---
-
         connect(sidebar, &Sidebar::projectToggled, this, &MainWindow::onProjectToggled);
         connect(sidebar, &Sidebar::terminalToggled, this, &MainWindow::onTerminalToggled);
+        connect(sidebar, &Sidebar::runClicked, this, &MainWindow::onRunClicked);
 
         connect(m_fileExplorer, &FileExplorerWidget::fileSelected, this, [this](const QString &newPath) {
-            // Если в редакторе уже открыт какой-то файл
             if (!m_editor->currentFilePath().isEmpty()) {
-                // Если текст был изменен (isModified), сохраняем его
                 if (m_editor->document()->isModified()) {
-                    qDebug() << "Auto-saving:" << m_editor->currentFilePath();
                     m_editor->saveCurrentFile();
                 }
             }
 
-            // Загружаем новый файл
-            qDebug() << "Opening new file:" << newPath;
             if (!m_editor->loadFile(newPath)) {
-                QMessageBox::warning(this, "Error", "Could not open file:\n" + newPath);
+                QMessageBox::warning(this, "Error", MSG_ERR_OPEN_FILE + newPath);
             }
         });
+
+        connect(m_terminal, &TerminalWidget::inputReady, this, &MainWindow::onTerminalInput);
+
+        m_updateTimer = new QTimer(this);
+        connect(m_updateTimer, &QTimer::timeout, this, &MainWindow::processOutputQueue);
+        m_updateTimer->start(50); // Проверяем очередь каждые 50 мс
+    }
+
+    void MainWindow::onTerminalInput(const QString& text) {
+        // Исправлено: m_controller -> m_buildController
+        if (m_buildController) {
+            m_buildController->writeInput(text.toStdString());
+        }
+    }
+
+    void MainWindow::onRunClicked() {
+        const QString currentFilePath = m_editor->currentFilePath();
+        if (currentFilePath.isEmpty()) {
+            m_terminal->appendOutput(MSG_NO_FILE_OPENED, true);
+            return;
+        }
+
+        if (m_editor->document()->isModified()) {
+            m_editor->saveCurrentFile();
+        }
+
+        const QString content = m_editor->document()->toPlainText();
+        if (!m_javaProvider->isRunnable(currentFilePath.toStdString(), content.toStdString())) {
+            m_terminal->appendOutput(MSG_FILE_NOT_RUNNABLE, true);
+            return;
+        }
+
+        m_terminal->clearTerminal();
+        m_terminal->appendOutput(MSG_BUILD_STARTING, false);
+
+        if (!m_terminal->isVisible()) {
+            m_terminal->setVisible(true);
+        }
+
+        const std::string projPath = QFileInfo(currentFilePath).absolutePath().toStdString();
+        const std::string sourceFile = currentFilePath.toStdString();
+
+        // Запускаем через поток и очередь (как в твоем "рабочем" примере)
+        std::thread([this, projPath, sourceFile]() {
+            m_buildController->runProject(
+                projPath,
+                sourceFile,
+                StepType::Run,
+                [this](const std::string& text, bool isError) {
+                    // Маркируем поток вывода
+                    std::string prefix = isError ? "E:" : "O:";
+                    m_outputQueue.push(prefix + text);
+                }
+            );
+            m_outputQueue.push("O:\n--- Process Finished ---\n");
+        }).detach();
+    }
+
+    void MainWindow::processOutputQueue() {
+        // Выгребаем всё из очереди за один тик таймера
+        while (auto msg = m_outputQueue.tryPop()) {
+            QString text = QString::fromStdString(*msg);
+            bool isError = text.startsWith("E:");
+            m_terminal->appendOutput(text.mid(2), isError);
+        }
     }
 
     void MainWindow::onProjectToggled(bool checked) {
@@ -132,7 +204,7 @@ namespace gs {
         if (ProjectManager::instance().openProject(dir)) {
             loadProject(dir);
         } else {
-            QMessageBox::warning(this, "Error", "Selected directory is not a valid project.");
+            QMessageBox::warning(this, "Error", MSG_ERR_NOT_PROJECT);
         }
     }
 

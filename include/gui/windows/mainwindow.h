@@ -4,8 +4,12 @@
 #include <QSplitter>
 #include <QTextEdit>
 
+#include "core/execution/ibuildcontroller.h"
+#include "core/utils/threadsafequeue.h"
 #include "gui/fileexplorerwidget.h"
-#include "gui/fileview.h" // Подключаем наш новый класс
+#include "gui/fileview.h"
+#include "gui/terminalwidget.h"
+#include "sdk/ilanguageprovider.h"
 
 namespace Ui {
     class MainWindow;
@@ -28,20 +32,26 @@ namespace gs {
     private slots:
         void onProjectToggled(bool checked);
         void onTerminalToggled(bool checked);
+        void onOpenProjectTriggered();
+        void onRunClicked();
+        void processOutputQueue();
 
     private:
         Ui::MainWindow *ui;
 
         FileExplorerWidget *m_fileExplorer;
-
-        // Поле для управления редактором
         FileView *m_editor;
-
-        QTextEdit *m_terminal;
+        TerminalWidget *m_terminal;
         QSplitter *m_hSplitter;
         QSplitter *m_vSplitter;
 
-        void onOpenProjectTriggered();
+        std::shared_ptr<IBuildController> m_buildController;
+        std::shared_ptr<ILanguageProvider> m_javaProvider;
+
+        ThreadSafeQueue m_outputQueue;
+        QTimer *m_updateTimer;
+
+        void onTerminalInput(const QString& text);
     };
 
 } // namespace gs

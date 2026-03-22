@@ -14,6 +14,7 @@ namespace gs {
         std::vector<std::shared_ptr<IBuildStep>> getBuildPipeline(
             const std::string& projectPath,
             const std::string& className) override;
+        bool isRunnable(const std::string& filePath, const std::string& content) const override;
 
         std::vector<std::string> getSupportedExtensions() const override;
         QJsonObject parseFile(const QString& filePath, const QString& content) override;

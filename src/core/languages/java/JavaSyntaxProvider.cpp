@@ -16,7 +16,7 @@ namespace gs {
         };
 
         for (const auto& word : keywords) {
-            rules.push_back({"^" + word + "$", TokenType::Keyword});
+            rules.push_back({"\\b" + word + "\\b", TokenType::Keyword});
         }
 
         // 2. Встроенные типы (Types)

@@ -49,7 +49,6 @@ namespace gs {
 
     void SyntaxHighlighter::setupFormats() {
         QTextCharFormat format;
-        format.setForeground(Qt::red);
         format.setForeground(colors::KEYWORD);
         m_formats[TokenType::Keyword] = format;
 

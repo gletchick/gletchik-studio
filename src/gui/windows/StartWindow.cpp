@@ -1,8 +1,12 @@
+#include <qcoreapplication.h>
 #include <QLabel>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QIcon>
 #include <QFileDialog>
+
+#include "core/execution/pluginmanager.h"
+#include "core/processes/nativeprocess.h"
 #include "gui/windows/mainwindow.h"
 
 #include "core/project/projectmanager.h"
@@ -142,6 +146,17 @@ namespace gs {
         tileLayout->addWidget(textLabel, 0, Qt::AlignCenter);
 
         return tileContainer;
+    }
+
+    void StartWindow::initializePlugins() {
+        // Определяем путь к плагинам (например, папка 'plugins' рядом с экзешником)
+        QString pluginsPath = QCoreApplication::applicationDirPath() + "/plugins";
+
+        // Создаем базовый процесс, если он требуется провайдерам для работы (например, для запуска компилятора)
+        auto defaultProcess = std::make_shared<NativeProcess>();
+
+        // Загружаем все доступные языковые провайдеры (Java и т.д.)
+        PluginManager::loadAllFromDir(pluginsPath.toStdString(), defaultProcess);
     }
 
 } // namespace gs

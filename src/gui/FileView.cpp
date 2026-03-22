@@ -1,7 +1,11 @@
+#include <QFileInfo>
+
 #include "gui/fileview.h"
 #include "core/project/filemanager.h"
 #include <QFont>
 #include <QPalette>
+
+#include "core/execution/pluginmanager.h"
 
 namespace gs {
 
@@ -37,8 +41,27 @@ namespace gs {
         if (filePath.isEmpty()) return false;
 
         QString content = FileManager::readFile(filePath);
+        if (content.isNull() && !filePath.isEmpty()) return false;
+
         this->setPlainText(content);
         m_filePath = filePath;
+
+        QFileInfo fileInfo(filePath);
+        QString extension = "." + fileInfo.suffix();
+        auto provider = PluginManager::getProviderByExtension(extension.toStdString());
+
+        if (provider) {
+            auto syntaxProvider = provider->getSyntaxProvider();
+
+            if (syntaxProvider) {
+                this->applySyntaxRules(syntaxProvider->getSyntaxRules());
+            } else {
+                qWarning() << "SyntaxProvider is null for extension:" << extension;
+                this->applySyntaxRules({}); // Сбрасываем в пустые правила
+            }
+        } else {
+            this->applySyntaxRules({});
+        }
 
         this->document()->setModified(false);
         return true;
@@ -57,4 +80,9 @@ namespace gs {
         return success;
     }
 
+    void FileView::applySyntaxRules(const std::vector<HighlightRule>& rules) {
+        if (m_highlighter) {
+            m_highlighter->setRules(rules);
+        }
+    }
 } // namespace gs

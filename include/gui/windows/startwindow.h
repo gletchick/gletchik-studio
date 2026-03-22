@@ -21,6 +21,8 @@ namespace gs {
                                          const QString &text,
                                          QWidget *parent,
                                          std::function<void()> onClick);
+
+        void initializePlugins();
     };
 
 } // namespace gs

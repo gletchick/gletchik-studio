@@ -9,6 +9,10 @@
 
 namespace gs {
 
+    namespace constants {
+        const QString WORD_AND_NUMBER_REGEX_PATTERN = R"(\b[A-Za-z_]\w*\b|\b\d+\b)";
+    }
+
     struct Token {
         TokenType type;
         int start;
@@ -24,12 +28,16 @@ namespace gs {
     class WordAnalyzier {
     public:
         WordAnalyzier(const std::vector<HighlightRule>& rules);
+        // Добавим явный деструктор для отладки, если падение повторится
+        ~WordAnalyzier() = default;
+
         std::vector<Token> analyzeLine(const QString& text);
 
     private:
         bool isStaticKeyword(const QString& word, TokenType& outType);
 
         QHash<QString, TokenType> m_staticKeywords;
+        // Храним по значению, чтобы избежать лишних аллокаций и проблем с unique_ptr
         std::vector<CompiledRule> m_compiledRules;
         QRegularExpression m_wordElementRegex;
     };

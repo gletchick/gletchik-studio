@@ -1,9 +1,10 @@
-#ifndef GLETCHIK_STUDIO_FILEVIEW_H
-#define GLETCHIK_STUDIO_FILEVIEW_H
+#pragma once
 
 #include <QPlainTextEdit>
 #include <QString>
 #include <QWidget>
+
+#include "core/syntaxanaliz/syntaxhighlighter.h"
 
 namespace gs {
 
@@ -13,18 +14,17 @@ namespace gs {
     public:
         explicit FileView(QWidget *parent = nullptr);
 
-        // Загрузка контента через FileManager[cite: 1, 2]
         bool loadFile(const QString &filePath);
 
-        // Сохранение текущего контента через FileManager[cite: 1, 2]
+        void applySyntaxRules(const std::vector<HighlightRule>& rules);
+
         bool saveCurrentFile();
 
         QString currentFilePath() const { return m_filePath; }
 
     private:
         QString m_filePath;
+        SyntaxHighlighter *m_highlighter;
     };
 
 } // namespace gs
-
-#endif //GLETCHIK_STUDIO_FILEVIEW_H

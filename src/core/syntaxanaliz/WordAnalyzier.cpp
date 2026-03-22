@@ -1,53 +1,60 @@
 #include "core/syntaxanaliz/wordanalyzier.h"
 #include "core/project/projectmanager.h"
-#include "sdk/syntaxrules.h"
 
 namespace gs {
 
     WordAnalyzier::WordAnalyzier(const std::vector<HighlightRule>& rules) {
+        m_wordElementRegex = QRegularExpression(constants::WORD_AND_NUMBER_REGEX_PATTERN);
+        m_wordElementRegex.optimize();
+
         for (const auto& rule : rules) {
             QString pattern = QString::fromStdString(rule.regexPattern);
 
-
-            if (pattern.startsWith("\\b") && pattern.endsWith("\\b") && !pattern.contains("|")) {
-                QString word = pattern.mid(2, pattern.length() - 4);
-                m_staticKeywords.insert(word, rule.style);
+            if (pattern.startsWith("\\b") && pattern.endsWith("\\b")) {
+                QString cleanWord = pattern.mid(2, pattern.length() - 4);
+                m_staticKeywords[cleanWord] = rule.style;
             } else {
                 QRegularExpression re(pattern);
                 if (re.isValid()) {
+                    re.optimize();
                     m_compiledRules.push_back({std::move(re), rule.style});
                 }
             }
         }
-
-        m_wordElementRegex = QRegularExpression(R"(\b[A-Za-z_]\w*\b|\b\d+\b)");
     }
 
     std::vector<Token> WordAnalyzier::analyzeLine(const QString& text) {
-        std::vector<Token> tokens;
+        if (text.isEmpty()) {
+            return {};
+        }
 
+        std::vector<Token> tokens;
         auto it = m_wordElementRegex.globalMatch(text);
+
         while (it.hasNext()) {
             QRegularExpressionMatch match = it.next();
             QString captured = match.captured(0);
 
+            qDebug() << "Found word:" << captured << "at" << match.capturedStart();
+
             TokenType type = TokenType::Identifier;
 
             if (isStaticKeyword(captured, type)) {
-                tokens.push_back({type, match.capturedStart(), match.capturedLength(), captured});
+                tokens.push_back({type, static_cast<int>(match.capturedStart()), static_cast<int>(match.capturedLength()), captured});
                 continue;
             }
 
             bool isNumber = false;
             captured.toInt(&isNumber);
             if (isNumber) {
-                tokens.push_back({TokenType::Number, match.capturedStart(), match.capturedLength(), captured});
+                tokens.push_back({TokenType::Number, static_cast<int>(match.capturedStart()), static_cast<int>(match.capturedLength()), captured});
                 continue;
             }
 
-            // Внимание: этот вызов все еще является узким местом при многопоточном парсинге
+            // Безопасное обращение к синглтону
             type = ProjectManager::instance().getSemanticType(captured);
-            tokens.push_back({type, match.capturedStart(), match.capturedLength(), captured});
+            tokens.push_back({type, static_cast<int>(match.capturedStart()), static_cast<int>(match.capturedLength()), captured});
+            qDebug() << "Assigned type:" << static_cast<int>(type);
         }
 
         return tokens;
@@ -61,6 +68,7 @@ namespace gs {
         }
 
         for (const auto& rule : m_compiledRules) {
+            // Здесь собака зарыта
             if (rule.regex.match(word).hasMatch()) {
                 outType = rule.type;
                 return true;

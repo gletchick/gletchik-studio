@@ -5,6 +5,7 @@
 
 #include "core/languages/java/javasteps.h"
 #include "../../../../include/core/utils/javaparser.h"
+#include "core/languages/java/javasyntaxprovider.h"
 
 namespace fs = std::filesystem;
 
@@ -63,7 +64,8 @@ namespace gs {
     }
 
     std::shared_ptr<ISyntaxProvider> JavaLanguageProvider::getSyntaxProvider() {
-        return nullptr;
+        static std::shared_ptr<ISyntaxProvider> instance = std::make_shared<JavaSyntaxProvider>();
+        return instance;
     }
 
 } // namespace gs

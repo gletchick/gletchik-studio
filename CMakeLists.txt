@@ -66,6 +66,8 @@ set(CORE_SOURCES
         src/core/syntaxanaliz/syntaxHighlighter.cpp
         include/core/languages/java/javasyntaxprovider.h
         src/core/languages/java/JavaSyntaxProvider.cpp
+        include/core/syntaxanaliz/projectindex.h
+        src/core/syntaxanaliz/projectindex.cpp
 )
 
 add_executable(gletchik-studio

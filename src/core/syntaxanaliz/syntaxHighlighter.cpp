@@ -1,18 +1,36 @@
 #include "core/syntaxanaliz/syntaxhighlighter.h"
 #include "core/syntaxanaliz/wordanalyzier.h"
+#include "core/project/projectmanager.h"
 
 namespace gs {
 
     namespace colors {
-        const QColor KEYWORD = QColor(86, 156, 214);       // Синий (VS Code style)
-        const QColor TYPE = QColor(78, 201, 176);          // Бирюзовый
-        const QColor STRING = QColor(206, 145, 120);       // Оранжевый
-        const QColor COMMENT = QColor(106, 153, 85);       // Зеленый
-        const QColor NUMBER = QColor(181, 206, 168);       // Салатовый
-        const QColor IDENTIFIER = QColor(212, 212, 212);   // Базовый текст
-        const QColor PROJECT_CLASS = QColor(78, 201, 176); 
-        const QColor PROJECT_METHOD = QColor(220, 220, 170); // Желтоватый
-        const QColor PROJECT_FIELD = QColor(156, 220, 254);  // Светло-голубой
+        // Основной текст — мягкий молочный, чтобы глаза не уставали
+        const QColor IDENTIFIER = QColor(230, 230, 230);
+
+        // Ключевые слова (if, while, class) — дерзкий Розовый/Маджента
+        const QColor KEYWORD = QColor(255, 121, 198);
+
+        // Типы данных (int, String) — Яркий Бирюзовый (Cyan)
+        const QColor TYPE = QColor(139, 233, 253);
+
+        // Строки — Золотисто-желтый (вместо привычного оранжевого/зеленого)
+        const QColor STRING = QColor(241, 250, 140);
+
+        // Комментарии — Приглушенный Индиго (они уходят на задний план)
+        const QColor COMMENT = QColor(98, 114, 164);
+
+        // Числа — Ярко-оранжевый (Saffron)
+        const QColor NUMBER = QColor(255, 184, 108);
+
+        // Твои классы проекта — Светло-зеленый неон
+        const QColor PROJECT_CLASS = QColor(80, 250, 123);
+
+        // Твои методы — Лавандовый (вместо желтого из VS Code)
+        const QColor PROJECT_METHOD = QColor(189, 147, 249);
+
+        // Поля проекта — Небесно-голубой
+        const QColor PROJECT_FIELD = QColor(137, 221, 255);
     }
 
     SyntaxHighlighter::SyntaxHighlighter(QTextDocument *parent)
@@ -23,58 +41,52 @@ namespace gs {
     SyntaxHighlighter::~SyntaxHighlighter() = default;
 
     void SyntaxHighlighter::setRules(const std::vector<HighlightRule>& rules) {
-        auto newAnalyzer = std::make_shared<WordAnalyzier>(rules);
-
-        m_analyzer = std::move(newAnalyzer);
-
+        m_analyzer = std::make_shared<WordAnalyzier>(rules);
         rehighlight();
     }
 
     void SyntaxHighlighter::highlightBlock(const QString &text) {
-        // Копируем shared_ptr — теперь объект не умрет, пока мы работаем
-        auto currentAnalyzer = m_analyzer;
-
-        if (!currentAnalyzer) {
+        if (!m_analyzer || text.isEmpty()) {
             return;
         }
 
-        // Работаем с локальной копией
-        std::vector<Token> tokens = currentAnalyzer->analyzeLine(text);
+        const std::vector<Token> tokens = m_analyzer->analyzeLine(text);
 
         for (const auto& token : tokens) {
-            QTextCharFormat format = m_formats.value(token.type, m_formats[TokenType::Identifier]);
+            TokenType actualType = token.type;
+            qDebug() << "[Highlighter] Applying format for type:" << (int)token.type << "to word:" << token.value;
+            // СЕМАНТИЧЕСКИЙ ЧЕК: Если это обычное слово, проверяем его в индексе проекта
+            if (actualType == TokenType::Identifier) {
+                // Используем значение из токена (оно уже вырезано в analyzeLine)
+                TokenType semanticType = ProjectManager::instance().getSemanticType(token.value);
+
+                if (semanticType != TokenType::Identifier) {
+                    actualType = semanticType;
+                }
+            }
+
+            // Получаем формат. Если типа нет в мапе, берем стандартный IDENTIFIER
+            QTextCharFormat format = m_formats.value(actualType, m_formats[TokenType::Identifier]);
             setFormat(token.start, token.length, format);
         }
     }
 
     void SyntaxHighlighter::setupFormats() {
-        QTextCharFormat format;
-        format.setForeground(colors::KEYWORD);
-        m_formats[TokenType::Keyword] = format;
+        auto createFormat = [](const QColor& color) {
+            QTextCharFormat f;
+            f.setForeground(color);
+            return f;
+        };
 
-        format.setForeground(colors::TYPE);
-        m_formats[TokenType::Type] = format;
-
-        format.setForeground(colors::STRING);
-        m_formats[TokenType::String] = format;
-
-        format.setForeground(colors::COMMENT);
-        m_formats[TokenType::Comment] = format;
-
-        format.setForeground(colors::NUMBER);
-        m_formats[TokenType::Number] = format;
-
-        format.setForeground(colors::IDENTIFIER);
-        m_formats[TokenType::Identifier] = format;
-
-        format.setForeground(colors::PROJECT_CLASS);
-        m_formats[TokenType::ProjectClass] = format;
-
-        format.setForeground(colors::PROJECT_METHOD);
-        m_formats[TokenType::ProjectMethod] = format;
-
-        format.setForeground(colors::PROJECT_FIELD);
-        m_formats[TokenType::ProjectField] = format;
+        m_formats[TokenType::Keyword] = createFormat(colors::KEYWORD);
+        m_formats[TokenType::Type] = createFormat(colors::TYPE);
+        m_formats[TokenType::String] = createFormat(colors::STRING);
+        m_formats[TokenType::Comment] = createFormat(colors::COMMENT);
+        m_formats[TokenType::Number] = createFormat(colors::NUMBER);
+        m_formats[TokenType::Identifier] = createFormat(colors::IDENTIFIER);
+        m_formats[TokenType::ProjectClass] = createFormat(colors::PROJECT_CLASS);
+        m_formats[TokenType::ProjectMethod] = createFormat(colors::PROJECT_METHOD);
+        m_formats[TokenType::ProjectField] = createFormat(colors::PROJECT_FIELD);
     }
 
 } // namespace gs

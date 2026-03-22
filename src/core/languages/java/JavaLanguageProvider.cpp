@@ -2,10 +2,22 @@
 
 #include <filesystem>
 #include <iostream>
-
+#include <QJsonArray>
 #include "core/languages/java/javasteps.h"
 #include "../../../../include/core/utils/javaparser.h"
 #include "core/languages/java/javasyntaxprovider.h"
+
+namespace {
+    const QString K_CLASSES = "classes";
+    const QString K_METHODS = "methods";
+
+    // Паттерн для классов, интерфейсов, перечней и рекордов
+    const QString CLASS_PATTERN = "\\b(?:class|interface|enum|record)\\s+([A-Za-z_][A-Za-z0-9_]*)";
+
+    // Упрощенный паттерн для методов: ищем сигнатуру (модификатор + тип + имя + скобка)
+    // Группа 1 захватывает именно имя метода
+    const QString METHOD_PATTERN = "(?:public|protected|private|static|\\s) +[\\w\\<\\>\\[\\]\\, ]+\\s+([A-Za-z_][A-Za-z0-9_]*)\\s*\\(";
+}
 
 namespace fs = std::filesystem;
 
@@ -60,7 +72,43 @@ namespace gs {
     }
 
     QJsonObject JavaLanguageProvider::parseFile(const QString& filePath, const QString& content) {
-        return QJsonObject();
+        QJsonObject result;
+        QJsonArray classesArray;
+        QJsonArray methodsArray;
+
+        QRegularExpression classRegex(CLASS_PATTERN);
+        QRegularExpression methodRegex(METHOD_PATTERN);
+
+        // Поиск всех определений классов
+        auto classIt = classRegex.globalMatch(content);
+        while (classIt.hasNext()) {
+            auto match = classIt.next();
+            QString className = match.captured(1);
+            if (!className.isEmpty()) {
+                classesArray.append(className);
+            }
+        }
+
+        // Поиск всех определений методов
+        auto methodIt = methodRegex.globalMatch(content);
+        while (methodIt.hasNext()) {
+            auto match = methodIt.next();
+            QString methodName = match.captured(1);
+
+            // Фильтруем ключевые слова, которые могут попасть под паттерн (например, if, while)
+            static const QSet<QString> excludeKeywords = {
+                "if", "for", "while", "switch", "catch", "synchronized"
+            };
+
+            if (!methodName.isEmpty() && !excludeKeywords.contains(methodName)) {
+                methodsArray.append(methodName);
+            }
+        }
+
+        result[K_CLASSES] = classesArray;
+        result[K_METHODS] = methodsArray;
+
+        return result;
     }
 
     std::shared_ptr<ISyntaxProvider> JavaLanguageProvider::getSyntaxProvider() {

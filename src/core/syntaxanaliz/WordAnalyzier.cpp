@@ -1,5 +1,6 @@
 #include "core/syntaxanaliz/wordanalyzier.h"
-#include "core/project/projectmanager.h"
+#include <algorithm>
+#include <QDebug>
 
 namespace gs {
 
@@ -9,66 +10,61 @@ namespace gs {
 
         for (const auto& rule : rules) {
             QString pattern = QString::fromStdString(rule.regexPattern);
-
-            if (pattern.startsWith("\\b") && pattern.endsWith("\\b")) {
-                QString cleanWord = pattern.mid(2, pattern.length() - 4);
-                m_staticKeywords[cleanWord] = rule.style;
-            } else {
-                QRegularExpression re(pattern);
-                if (re.isValid()) {
-                    re.optimize();
-                    m_compiledRules.push_back({std::move(re), rule.style});
-                }
+            QRegularExpression re(pattern);
+            if (re.isValid()) {
+                re.optimize();
+                m_compiledRules.push_back({std::move(re), rule.style});
             }
         }
     }
 
     std::vector<Token> WordAnalyzier::analyzeLine(const QString& text) {
-        if (text.isEmpty()) {
-            return {};
+        if (text.isEmpty()) return {};
+
+        std::vector<Token> allFoundTokens;
+
+        // 1. Собираем абсолютно все совпадения по всем правилам
+        for (const auto& rule : m_compiledRules) {
+            auto it = rule.regex.globalMatch(text);
+            while (it.hasNext()) {
+                auto match = it.next();
+                allFoundTokens.push_back({
+                    rule.type,
+                    static_cast<int>(match.capturedStart()),
+                    static_cast<int>(match.capturedLength()),
+                    match.captured(0)
+                });
+            }
         }
 
-        std::vector<Token> tokens;
-        auto it = m_wordElementRegex.globalMatch(text);
+        // 2. Сортируем токены по позиции начала, а при равенстве — по длине (длинные важнее)
+        std::sort(allFoundTokens.begin(), allFoundTokens.end(), [](const Token& a, const Token& b) {
+            if (a.start != b.start) return a.start < b.start;
+            return a.length > b.length;
+        });
 
-        while (it.hasNext()) {
-            QRegularExpressionMatch match = it.next();
-            QString captured = match.captured(0);
+        // 3. Фильтруем пересечения (алгоритм "жадного" выбора)
+        std::vector<Token> finalTokens;
+        int lastPos = 0;
 
-            qDebug() << "Found word:" << captured << "at" << match.capturedStart();
-
-            TokenType type = TokenType::Identifier;
-
-            if (isStaticKeyword(captured, type)) {
-                tokens.push_back({type, static_cast<int>(match.capturedStart()), static_cast<int>(match.capturedLength()), captured});
-                continue;
+        for (const auto& token : allFoundTokens) {
+            // Если начало текущего токена больше или равно позиции конца предыдущего
+            if (token.start >= lastPos) {
+                finalTokens.push_back(token);
+                lastPos = token.start + token.length;
             }
-
-            bool isNumber = false;
-            captured.toInt(&isNumber);
-            if (isNumber) {
-                tokens.push_back({TokenType::Number, static_cast<int>(match.capturedStart()), static_cast<int>(match.capturedLength()), captured});
-                continue;
-            }
-
-            // Безопасное обращение к синглтону
-            type = ProjectManager::instance().getSemanticType(captured);
-            tokens.push_back({type, static_cast<int>(match.capturedStart()), static_cast<int>(match.capturedLength()), captured});
-            qDebug() << "Assigned type:" << static_cast<int>(type);
         }
 
-        return tokens;
+        if (!finalTokens.empty()) {
+            qDebug() << "[Analyzer] Line analyzed. Found tokens:" << finalTokens.size() << "Text context:" << text.left(20) << "...";
+        }
+
+        return finalTokens;
     }
 
     bool WordAnalyzier::isStaticKeyword(const QString& word, TokenType& outType) {
-        auto it = m_staticKeywords.find(word);
-        if (it != m_staticKeywords.end()) {
-            outType = it.value();
-            return true;
-        }
-
+        // Оставляем как вспомогательный метод, если понадобится прямая проверка слова
         for (const auto& rule : m_compiledRules) {
-            // Здесь собака зарыта
             if (rule.regex.match(word).hasMatch()) {
                 outType = rule.type;
                 return true;

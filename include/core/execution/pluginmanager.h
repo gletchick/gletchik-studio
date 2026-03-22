@@ -18,10 +18,12 @@ namespace gs {
                                                                              std::shared_ptr<IProcess> process);
 
         static std::shared_ptr<ILanguageProvider> getProviderByExtension(const std::string& extension);
+        static void registerBuiltInProvider(std::shared_ptr<ILanguageProvider> provider);
 
     private:
         static std::unordered_map<std::string, std::shared_ptr<ILanguageProvider>> m_providersMap;
         static std::shared_mutex m_mapMutex;
+
     };
 
 } // namespace gs

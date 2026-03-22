@@ -42,6 +42,8 @@ namespace gs {
     bool FileView::loadFile(const QString &filePath) {
         if (filePath.isEmpty()) return false;
 
+        qDebug() << "[FileView] Loading file:" << filePath;
+
         QString content = FileManager::readFile(filePath);
         if (content.isNull() && !filePath.isEmpty()) return false;
 
@@ -50,9 +52,13 @@ namespace gs {
 
         QFileInfo fileInfo(filePath);
         QString extension = "." + fileInfo.suffix();
+
         auto provider = PluginManager::getProviderByExtension(extension.toStdString());
 
         if (provider) {
+            qDebug() << "[FileView] Provider found for extension:" << extension
+                 << "Language:" << QString::fromStdString(provider->languageName());
+
             auto syntaxProvider = provider->getSyntaxProvider();
 
             if (syntaxProvider) {
@@ -62,6 +68,8 @@ namespace gs {
                 this->applySyntaxRules({}); // Сбрасываем в пустые правила
             }
         } else {
+            qWarning() << "[FileView] NO PROVIDER FOUND for extension:" << extension;
+
             this->applySyntaxRules({});
         }
 

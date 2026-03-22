@@ -37,7 +37,6 @@ namespace gs {
         bool isStaticKeyword(const QString& word, TokenType& outType);
 
         QHash<QString, TokenType> m_staticKeywords;
-        // Храним по значению, чтобы избежать лишних аллокаций и проблем с unique_ptr
         std::vector<CompiledRule> m_compiledRules;
         QRegularExpression m_wordElementRegex;
     };

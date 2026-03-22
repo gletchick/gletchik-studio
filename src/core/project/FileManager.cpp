@@ -1,17 +1,11 @@
 #include <filesystem>
 #include <QFile>
-#include <QTextStream>
-#include <QJsonObject>
-#include <QJsonValue>
 #include <QDebug>
 
-#include "core/execution/pluginmanager.h"
 #include "core/project/filemanager.h"
 #include "core/project/projectmanager.h"
-#include "core/utils/utils.h"
 
 namespace gs {
-    // В core/project/FileManager.cpp
     QString FileManager::readFile(const QString &filePath) {
         QFile file(filePath);
         if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -33,9 +27,6 @@ namespace gs {
         QTextStream out(&file);
         out << content;
         file.close();
-
-        ProjectManager::instance().processFile(filePath);
-        ProjectManager::instance().saveProject();
 
         return true;
     }

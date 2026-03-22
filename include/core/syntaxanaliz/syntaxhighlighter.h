@@ -10,7 +10,7 @@
 
 namespace gs {
 
-    class WordAnalyzier; // Предварительное объявление, чтобы не тянуть инклуды
+    class WordAnalyzier;
 
     class SyntaxHighlighter : public QSyntaxHighlighter {
         Q_OBJECT

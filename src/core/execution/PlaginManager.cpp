@@ -73,11 +73,37 @@ namespace gs {
 
     std::shared_ptr<ILanguageProvider> PluginManager::getProviderByExtension(const std::string& extension) {
         std::shared_lock<std::shared_mutex> lock(m_mapMutex);
+
         auto it = m_providersMap.find(extension);
         if (it != m_providersMap.end()) {
             return it->second;
         }
+
         return nullptr;
+    }
+
+    void PluginManager::registerBuiltInProvider(std::shared_ptr<ILanguageProvider> provider) {
+        if (!provider) {
+            return;
+        }
+
+        // Блокируем мапу на запись
+        std::unique_lock<std::shared_mutex> lock(m_mapMutex);
+
+        // Получаем список расширений, которые поддерживает этот провайдер
+        std::vector<std::string> extensions = provider->getSupportedExtensions();
+
+        for (const std::string& ext : extensions) {
+            // Важно: если расширение уже есть, мы его перезапишем встроенным
+            // или можно добавить проверку, если это критично.
+            m_providersMap[ext] = provider;
+
+            qDebug() << "[Plugins] Registered provider for extension:"
+                     << QString::fromStdString(ext);
+        }
+
+        qDebug() << "[Plugins] Built-in provider registered:"
+                 << QString::fromStdString(provider->languageName());
     }
 
 } // namespace gs

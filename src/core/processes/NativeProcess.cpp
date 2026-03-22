@@ -51,13 +51,10 @@ namespace gs {
             exit(1);
         }
 
-        // Родительский процесс
-        // Закрываем стороны пайпов, которые нам не нужны
-        close(m_stdinPipe[0]);  // Нам не нужно читать из stdin пайпа
-        close(m_stdoutPipe[1]); // Нам не нужно писать в stdout пайп
-        close(m_stderrPipe[1]); // Нам не нужно писать в stderr пайп
+        close(m_stdinPipe[0]);
+        close(m_stdoutPipe[1]);
+        close(m_stderrPipe[1]);
 
-        // Делаем чтение неблокирующим (как у тебя и было)
         fcntl(m_stdoutPipe[0], F_SETFL, O_NONBLOCK);
         fcntl(m_stderrPipe[0], F_SETFL, O_NONBLOCK);
 

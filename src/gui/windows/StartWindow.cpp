@@ -6,6 +6,7 @@
 #include <QFileDialog>
 
 #include "core/execution/pluginmanager.h"
+#include "core/languages/java/javalanguageprovider.h"
 #include "core/processes/nativeprocess.h"
 #include "gui/windows/mainwindow.h"
 
@@ -20,6 +21,7 @@ namespace gs {
         resize(850, 550);
 
         setupBaseWindow("Gletchick Studio IDE");
+        initializePlugins();
     }
 
     void StartWindow::setupWorkspace(QWidget *contentWidget) {
@@ -117,6 +119,7 @@ namespace gs {
         }));
     }
 
+
     QWidget* StartWindow::createLargeButton(const QString &iconPath, const QString &text, QWidget *parent, std::function<void()> onClick) {
         QWidget *tileContainer = new QWidget(parent);
         QVBoxLayout *tileLayout = new QVBoxLayout(tileContainer);
@@ -149,14 +152,16 @@ namespace gs {
     }
 
     void StartWindow::initializePlugins() {
-        // Определяем путь к плагинам (например, папка 'plugins' рядом с экзешником)
+        qDebug() << "[Plugins] Starting initialization...";
         QString pluginsPath = QCoreApplication::applicationDirPath() + "/plugins";
-
+        qDebug() << "[Plugins] Searching in:" << pluginsPath;
         // Создаем базовый процесс, если он требуется провайдерам для работы (например, для запуска компилятора)
         auto defaultProcess = std::make_shared<NativeProcess>();
-
+        auto javaProvider = std::make_shared<JavaLanguageProvider>(defaultProcess);
+        PluginManager::registerBuiltInProvider(javaProvider);
         // Загружаем все доступные языковые провайдеры (Java и т.д.)
         PluginManager::loadAllFromDir(pluginsPath.toStdString(), defaultProcess);
+        qDebug() << "[Plugins] Initialization finished.";
     }
 
 } // namespace gs

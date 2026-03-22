@@ -6,6 +6,7 @@
 #include <QMutex>
 #include <QSet>
 
+#include "core/syntaxanaliz/projectindex.h"
 #include "sdk/syntaxrules.h"
 
 namespace gs {
@@ -37,7 +38,7 @@ namespace gs {
         void rebuildSemanticCache();
 
         QString m_projectPath;
-        QJsonObject m_projectIndex;
+        ProjectIndex m_projectIndex;
 
         mutable QMutex m_dataMutex;
         mutable QReadWriteLock m_indexLock;

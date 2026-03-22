@@ -42,6 +42,7 @@ namespace gs {
 
         m_treeView = new QTreeView(this);
         m_treeView->setModel(m_fileModel);
+        m_treeView->setEditTriggers(QAbstractItemView::NoEditTriggers);
         m_treeView->setRootIndex(m_fileModel->index(currentPath));
         m_treeView->setHeaderHidden(true);
         m_treeView->setIndentation(TREE_INDENTATION);

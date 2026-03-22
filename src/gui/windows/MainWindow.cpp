@@ -1,10 +1,15 @@
-#include <QFileDialog>
-#include <QMessageBox>
-
 #include "gui/windows/mainwindow.h"
 #include "ui_mainwindow.h"
+
+#include "gui/fileview.h"
 #include "core/project/projectmanager.h"
 #include "gui/sidebar/sidebar.h"
+
+#include <QFileDialog>
+#include <QMessageBox>
+#include <QSplitter>
+#include <QHBoxLayout>
+#include <QDebug>
 
 namespace {
     constexpr int SPLITTER_HANDLE_WIDTH = 1;
@@ -13,8 +18,7 @@ namespace {
     constexpr int WINDOW_DEFAULT_WIDTH = 1000;
     constexpr int WINDOW_DEFAULT_HEIGHT = 700;
 
-    const QString WINDOW_TITLE = "My Application";
-    const QString CODE_EDITOR_PLACEHOLDER = "// Пишите код здесь...";
+    const QString WINDOW_TITLE = "Gletchik Studio";
     const QString TERMINAL_PLACEHOLDER = "Terminal >_";
 }
 
@@ -30,23 +34,21 @@ namespace gs {
         setupBaseWindow(WINDOW_TITLE);
     }
 
+    MainWindow::~MainWindow() {
+        delete ui;
+    }
+
     void MainWindow::loadProject(const QString &path) {
         if (path.isEmpty()) return;
 
-        // Обновляем дерево файлов
         m_fileExplorer->setRootPath(path);
-
-        // Обновляем заголовок окна для информативности
         setWindowTitle(WINDOW_TITLE + " - " + path);
-    }
-
-    MainWindow::~MainWindow() {
-        delete ui;
     }
 
     void MainWindow::setupWorkspace(QWidget *contentWidget) {
         ui->setupUi(contentWidget);
 
+        // 1. Инициализация сплиттеров
         m_vSplitter = new QSplitter(Qt::Vertical, contentWidget);
         m_vSplitter->setHandleWidth(SPLITTER_HANDLE_WIDTH);
         m_vSplitter->setChildrenCollapsible(false);
@@ -56,24 +58,23 @@ namespace gs {
         upperLayout->setContentsMargins(0, 0, 0, 0);
         upperLayout->setSpacing(0);
 
-        Sidebar *sidebar = new Sidebar(contentWidget);
+        Sidebar *sidebar = new Sidebar(upperWidget);
         upperLayout->addWidget(sidebar);
 
         m_hSplitter = new QSplitter(Qt::Horizontal, upperWidget);
         m_hSplitter->setHandleWidth(SPLITTER_HANDLE_WIDTH);
         m_hSplitter->setChildrenCollapsible(false);
 
-        // Инициализируем наш кастомный класс
-        m_fileExplorer = new FileExplorerWidget(contentWidget);
+        // 2. Инициализация компонентов
+        m_fileExplorer = new FileExplorerWidget(upperWidget);
 
-        QTextEdit *editor = new QTextEdit(contentWidget);
-        editor->setObjectName("codeEditor");
-        editor->setPlaceholderText(CODE_EDITOR_PLACEHOLDER);
-        editor->setMinimumWidth(EDITOR_MIN_WIDTH);
+        // Создаем наш FileView
+        m_editor = new FileView(upperWidget);
+        m_editor->setObjectName("codeEditor");
+        m_editor->setMinimumWidth(EDITOR_MIN_WIDTH);
 
         m_hSplitter->addWidget(m_fileExplorer);
-        m_hSplitter->addWidget(editor);
-
+        m_hSplitter->addWidget(m_editor);
         m_hSplitter->setStretchFactor(0, 0);
         m_hSplitter->setStretchFactor(1, 1);
 
@@ -86,7 +87,6 @@ namespace gs {
 
         m_vSplitter->addWidget(upperWidget);
         m_vSplitter->addWidget(m_terminal);
-
         m_vSplitter->setStretchFactor(0, 1);
         m_vSplitter->setStretchFactor(1, 0);
 
@@ -94,36 +94,45 @@ namespace gs {
             ui->mainVerticalLayout->addWidget(m_vSplitter);
         }
 
+        // --- ЛОГИКА АВТОСОХРАНЕНИЯ И ПЕРЕКЛЮЧЕНИЯ ---
+
         connect(sidebar, &Sidebar::projectToggled, this, &MainWindow::onProjectToggled);
         connect(sidebar, &Sidebar::terminalToggled, this, &MainWindow::onTerminalToggled);
 
-        connect(m_fileExplorer, &FileExplorerWidget::fileSelected, this, [editor](const QString &filePath) {
-            // Заглушка: здесь будет логика открытия файла и чтения его содержимого в editor
-            editor->append(QString("Opening: %1").arg(filePath));
+        connect(m_fileExplorer, &FileExplorerWidget::fileSelected, this, [this](const QString &newPath) {
+            // Если в редакторе уже открыт какой-то файл
+            if (!m_editor->currentFilePath().isEmpty()) {
+                // Если текст был изменен (isModified), сохраняем его
+                if (m_editor->document()->isModified()) {
+                    qDebug() << "Auto-saving:" << m_editor->currentFilePath();
+                    m_editor->saveCurrentFile();
+                }
+            }
+
+            // Загружаем новый файл
+            qDebug() << "Opening new file:" << newPath;
+            if (!m_editor->loadFile(newPath)) {
+                QMessageBox::warning(this, "Error", "Could not open file:\n" + newPath);
+            }
         });
     }
 
     void MainWindow::onProjectToggled(bool checked) {
-        m_fileExplorer->setVisible(checked);
+        if (m_fileExplorer) m_fileExplorer->setVisible(checked);
     }
 
     void MainWindow::onTerminalToggled(bool checked) {
-        m_terminal->setVisible(checked);
+        if (m_terminal) m_terminal->setVisible(checked);
     }
 
     void MainWindow::onOpenProjectTriggered() {
         QString dir = QFileDialog::getExistingDirectory(this, "Select Project", QDir::homePath());
-
         if (dir.isEmpty()) return;
 
-        // 1. Пытаемся открыть проект через менеджер
-        // Если папки .gs нет, можно предложить создать проект (createProject)
         if (ProjectManager::instance().openProject(dir)) {
-
-            // 2. Если менеджер успешно подгрузил индекс, обновляем UI
-            m_fileExplorer->setRootPath(dir);
+            loadProject(dir);
         } else {
-            QMessageBox::warning(this, "Error", "Selected directory is not a valid project (no .gs folder found).");
+            QMessageBox::warning(this, "Error", "Selected directory is not a valid project.");
         }
     }
 

@@ -5,6 +5,7 @@
 #include <QTextEdit>
 
 #include "gui/fileexplorerwidget.h"
+#include "gui/fileview.h" // Подключаем наш новый класс
 
 namespace Ui {
     class MainWindow;
@@ -32,6 +33,10 @@ namespace gs {
         Ui::MainWindow *ui;
 
         FileExplorerWidget *m_fileExplorer;
+
+        // Поле для управления редактором
+        FileView *m_editor;
+
         QTextEdit *m_terminal;
         QSplitter *m_hSplitter;
         QSplitter *m_vSplitter;

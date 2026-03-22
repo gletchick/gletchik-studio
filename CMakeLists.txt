@@ -62,6 +62,8 @@ set(CORE_SOURCES
         include/ui/gshighlighter.h
         src/ui/GSHighlighter.cpp
         sdk/steptype.h
+        src/gui/FileView.cpp
+        include/gui/fileview.h
 )
 
 add_executable(gletchik-studio

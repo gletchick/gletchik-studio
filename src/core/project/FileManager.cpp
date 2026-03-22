@@ -11,13 +11,17 @@
 #include "core/utils/utils.h"
 
 namespace gs {
+    // В core/project/FileManager.cpp
     QString FileManager::readFile(const QString &filePath) {
         QFile file(filePath);
         if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+            qDebug() << "CRITICAL: Could not open file for reading:" << filePath;
             return QString();
         }
         QTextStream in(&file);
-        return in.readAll();
+        QString content = in.readAll();
+        qDebug() << "SUCCESS: Read" << content.length() << "characters from" << filePath;
+        return content;
     }
 
     bool FileManager::saveFile(const QString &filePath, const QString &content) {

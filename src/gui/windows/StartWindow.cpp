@@ -4,6 +4,10 @@
 #include <QHBoxLayout>
 #include <QIcon>
 #include <QFileDialog>
+#include <QInputDialog>
+#include <QMessageBox>
+#include <QProcess>
+
 
 #include "core/execution/pluginmanager.h"
 #include "core/languages/java/javalanguageprovider.h"
@@ -79,52 +83,82 @@ namespace gs {
         mainLayout->addWidget(bottomBar);
     }
 
-void StartWindow::createActionButtons(QWidget *container, QLayout *layout) {
+void StartWindow::createActionButtons(QWidget *container, QLayout *layout)
+    {
+        // 1. NEW PROJECT
+        layout->addWidget(createLargeButton(":/icons/create-project.svg", "New Project", container, [this]() {
+            QFileDialog dialog(this);
+            dialog.setWindowFlags(Qt::Window | Qt::FramelessWindowHint); // Убираем белую рамку
+            dialog.setWindowTitle("Select Directory for New Project");
+            dialog.setFileMode(QFileDialog::Directory);
+            dialog.setOption(QFileDialog::ShowDirsOnly, true);
+            dialog.setOption(QFileDialog::DontUseNativeDialog, true); // Включаем наш QSS
 
-    // 1. NEW PROJECT
-    layout->addWidget(createLargeButton(":/icons/create-project.svg", "New Project", container, [this]() {
-        QFileDialog dialog(this);
-        dialog.setWindowFlags(Qt::Window | Qt::FramelessWindowHint); // Убираем белую рамку
-        dialog.setWindowTitle("Select Directory for New Project");
-        dialog.setFileMode(QFileDialog::Directory);
-        dialog.setOption(QFileDialog::ShowDirsOnly, true);
-        dialog.setOption(QFileDialog::DontUseNativeDialog, true); // Включаем наш QSS
-
-        if (dialog.exec()) {
-            QString dir = dialog.selectedFiles().first();
-            if (ProjectManager::instance().createProject(dir)) {
-                MainWindow *mainWin = new MainWindow();
-                mainWin->loadProject(dir);
-                mainWin->show();
-                this->close();
+            if (dialog.exec()) {
+                QString dir = dialog.selectedFiles().first();
+                if (ProjectManager::instance().createProject(dir)) {
+                    MainWindow *mainWin = new MainWindow();
+                    mainWin->loadProject(dir);
+                    mainWin->show();
+                    this->close();
+                }
             }
-        }
-    }));
+        }));
 
-    // 2. OPEN PROJECT
-    layout->addWidget(createLargeButton(":/icons/open-project.svg", "Open Project", container, [this]() {
-        QFileDialog dialog(this);
-        dialog.setWindowFlags(Qt::Window | Qt::FramelessWindowHint); // Убираем белую рамку
-        dialog.setWindowTitle("Open Project");
-        dialog.setFileMode(QFileDialog::Directory);
-        dialog.setOption(QFileDialog::ShowDirsOnly, true);
-        dialog.setOption(QFileDialog::DontUseNativeDialog, true); // Включаем наш QSS
+        // 2. OPEN PROJECT
+        layout->addWidget(createLargeButton(":/icons/open-project.svg", "Open Project", container, [this]() {
+            QFileDialog dialog(this);
+            dialog.setWindowFlags(Qt::Window | Qt::FramelessWindowHint); // Убираем белую рамку
+            dialog.setWindowTitle("Open Project");
+            dialog.setFileMode(QFileDialog::Directory);
+            dialog.setOption(QFileDialog::ShowDirsOnly, true);
+            dialog.setOption(QFileDialog::DontUseNativeDialog, true); // Включаем наш QSS
 
-        if (dialog.exec()) {
-            QString dir = dialog.selectedFiles().first();
-            if (ProjectManager::instance().openProject(dir)) {
-                MainWindow *mainWin = new MainWindow();
-                mainWin->loadProject(dir);
-                mainWin->show();
-                this->close();
+            if (dialog.exec()) {
+                QString dir = dialog.selectedFiles().first();
+                if (ProjectManager::instance().openProject(dir)) {
+                    MainWindow *mainWin = new MainWindow();
+                    mainWin->loadProject(dir);
+                    mainWin->show();
+                    this->close();
+                }
             }
-        }
-    }));
+        }));
 
-    layout->addWidget(createLargeButton(":/icons/project-from-git.svg", "Get from VCS", container, []() {
-        ProjectManager::instance().cloneFromVCS("https://github.com/user/repo.git", "/target/path");
-    }));
-}
+        // 3. GET FROM VCS
+        layout->addWidget(createLargeButton(":/icons/project-from-git.svg", "Get from VCS", container, [this]() {
+            bool ok;
+            QString repoUrl = QInputDialog::getText(this, "Clone", "Repository URL:", QLineEdit::Normal, "https://github.com/", &ok);
+
+            if (ok && !repoUrl.isEmpty()) {
+                QString dir = QFileDialog::getExistingDirectory(this, "Select Directory");
+                if (!dir.isEmpty()) {
+                    QProcess *git = new QProcess(this);
+
+                    QStringList args;
+                    args << "clone" << repoUrl << dir;
+
+                    connect(git, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
+                            this, [this, dir, git](int exitCode, QProcess::ExitStatus exitStatus) {
+
+                        if (exitCode == 0 && exitStatus == QProcess::NormalExit) {
+                            MainWindow *mainWin = new MainWindow();
+                            mainWin->loadProject(dir);
+                            mainWin->show();
+                            this->close();
+                        } else {
+                            QString errorLog = git->readAllStandardError();
+                            QMessageBox::critical(this, "Error", "Git clone failed!\n" + errorLog);
+                        }
+
+                        git->deleteLater();
+                    });
+
+                    git->start("git", args);
+                }
+            }
+        }));
+    }
 
     QWidget* StartWindow::createLargeButton(const QString &iconPath, const QString &text, QWidget *parent, std::function<void()> onClick) {
         QWidget *tileContainer = new QWidget(parent);
@@ -168,6 +202,31 @@ void StartWindow::createActionButtons(QWidget *container, QLayout *layout) {
         // Загружаем все доступные языковые провайдеры (Java и т.д.)
         PluginManager::loadAllFromDir(pluginsPath.toStdString(), defaultProcess);
         qDebug() << "[Plugins] Initialization finished.";
+    }
+
+    void StartWindow::cloneAndOpen(const QString &url, const QString &path) {
+        QProcess *gitProcess = new QProcess(this);
+
+        qDebug() << "Cloning" << url << "to" << path;
+
+        connect(gitProcess, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
+                this, [this, path, gitProcess](int exitCode, QProcess::ExitStatus exitStatus) {
+
+            if (exitCode == 0 && exitStatus == QProcess::NormalExit) {
+                if (ProjectManager::instance().openProject(path)) {
+                    MainWindow *mainWin = new MainWindow();
+                    mainWin->loadProject(path);
+                    mainWin->show();
+                    this->close();
+                }
+            } else {
+                QString errorLog = gitProcess->readAllStandardError();
+                QMessageBox::critical(this, "Git Error", "Failed to clone repository!\n" + errorLog);
+            }
+            gitProcess->deleteLater();
+        });
+
+        gitProcess->start("git", QStringList() << "clone" << url << path);
     }
 
 } // namespace gs

@@ -23,6 +23,7 @@ namespace gs {
                                          std::function<void()> onClick);
 
         void initializePlugins();
+        void cloneAndOpen(const QString &url, const QString &path);
     };
 
 } // namespace gs

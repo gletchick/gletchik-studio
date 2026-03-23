@@ -4,6 +4,8 @@
 #include <QFile>
 #include <QDir>
 #include <QDebug>
+#include <QMenu>
+#include <QAction>
 
 #include "gui/fileexplorerwidget.h"
 
@@ -46,6 +48,10 @@ namespace gs {
         m_treeView->setContextMenuPolicy(Qt::CustomContextMenu);
         m_treeView->setHeaderHidden(true);
 
+        // ОТКЛЮЧАЕМ редактирование по двойному клику
+        m_treeView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+
+        // Скрываем колонки с размером, типом и датой
         for (int i = 1; i < m_fileModel->columnCount(); ++i) {
             m_treeView->hideColumn(i);
         }
@@ -63,9 +69,12 @@ namespace gs {
 
     void FileExplorerWidget::onDoubleClicked(const QModelIndex &index) {
         if (!index.isValid()) return;
+
         QString path = m_fileModel->filePath(index);
 
+        // Открываем только если это файл (пустые файлы теперь тоже пройдут)
         if (!path.isEmpty() && QFileInfo(path).isFile()) {
+            qDebug() << "[Explorer] Double click opening:" << path;
             emit fileSelected(path);
         }
     }
@@ -84,39 +93,38 @@ namespace gs {
 
         if (!selected) return;
 
-        // Определяем папку, где будем создавать
-        QString targetDirPath;
-        if (index.isValid()) {
-            QString itemPath = m_fileModel->filePath(index);
-            targetDirPath = QFileInfo(itemPath).isDir() ? itemPath : QFileInfo(itemPath).absolutePath();
-        } else {
-            targetDirPath = m_fileModel->rootPath();
-        }
+        // Определяем рабочую папку
+        QString targetPath = m_fileModel->filePath(index.isValid() ? index : m_treeView->rootIndex());
+        if (targetPath.isEmpty()) targetPath = m_fileModel->rootPath();
 
-        QDir dir(targetDirPath);
+        QFileInfo targetInfo(targetPath);
+        QDir dir(targetInfo.isDir() ? targetPath : targetInfo.absolutePath());
 
         if (selected == newFileAction) {
             bool ok;
             QString name = QInputDialog::getText(this, DIALOG_NEW_FILE_TITLE, DIALOG_NEW_FILE_LABEL, QLineEdit::Normal, "", &ok);
 
             if (ok && !name.isEmpty()) {
-                QString fullPath = dir.absoluteFilePath(name);
+                QString fullFilePath = dir.absoluteFilePath(name);
+                QFile file(fullFilePath);
 
-                QFile file(fullPath);
-                // Временно блокируем сигналы дерева, чтобы оно не пыталось само открыть файл пока мы его создаем
+                // Блокируем сигналы, чтобы дерево не перехватило фокус в момент создания
                 m_treeView->blockSignals(true);
 
-                if (file.open(QIODevice::WriteOnly)) {
+                if (file.open(QIODevice::ReadWrite | QIODevice::Text)) {
+                    file.write(""); // Гарантируем наличие контента для ОС
+                    file.flush();
                     file.close();
 
-                    // Даем модели команду обновиться
-                    m_fileModel->fetchMore(m_fileModel->index(targetDirPath));
+                    qDebug() << "[Explorer] New file created:" << fullFilePath;
 
-                    // Эмитим сигнал открытия напрямую
-                    qDebug() << "[Explorer] Success creation, opening:" << fullPath;
-                    emit fileSelected(fullPath);
+                    // Обновляем модель
+                    m_fileModel->fetchMore(m_fileModel->index(dir.absolutePath()));
+
+                    // Сразу шлем сигнал на открытие
+                    emit fileSelected(fullFilePath);
                 } else {
-                    QMessageBox::critical(this, "Error", "Create failed: " + file.errorString());
+                    QMessageBox::critical(this, "Error", "Can't create file: " + file.errorString());
                 }
 
                 m_treeView->blockSignals(false);
@@ -126,10 +134,13 @@ namespace gs {
             bool ok;
             QString name = QInputDialog::getText(this, DIALOG_NEW_DIR_TITLE, DIALOG_NEW_DIR_LABEL, QLineEdit::Normal, "", &ok);
             if (ok && !name.isEmpty()) {
-                dir.mkdir(name);
+                if (!dir.mkdir(name)) {
+                    QMessageBox::critical(this, "Error", "Could not create directory");
+                }
             }
         }
         else if (selected == renameAction && index.isValid()) {
+            // Переименование разрешено только через контекстное меню
             m_treeView->edit(index);
         }
         else if (selected == deleteAction && index.isValid()) {

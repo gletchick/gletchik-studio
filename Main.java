@@ -5,7 +5,6 @@ public class Main {
         System.out.println("Java Echo Program Started.");
         System.out.println("Type something and press Enter (type 'exit' to quit):");
 
-        // Исправлено: просто System.in
         Scanner scanner = new Scanner(System.in);
 
         while (true) {

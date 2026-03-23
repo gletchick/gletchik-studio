@@ -39,39 +39,23 @@ namespace gs {
         this->setFrameStyle(QFrame::NoFrame);
     }
 
-    bool FileView::loadFile(const QString &filePath) {
-        if (filePath.isEmpty()) return false;
+    // FileView.cpp
 
+    bool FileView::loadFile(const QString &filePath) {
         qDebug() << "[FileView] Loading file:" << filePath;
 
         QString content = FileManager::readFile(filePath);
-        if (content.isNull() && !filePath.isEmpty()) return false;
 
-        this->setPlainText(content);
-        m_filePath = filePath;
-
-        QFileInfo fileInfo(filePath);
-        QString extension = "." + fileInfo.suffix();
-
-        auto provider = PluginManager::getProviderByExtension(extension.toStdString());
-
-        if (provider) {
-            qDebug() << "[FileView] Provider found for extension:" << extension
-                 << "Language:" << QString::fromStdString(provider->languageName());
-
-            auto syntaxProvider = provider->getSyntaxProvider();
-
-            if (syntaxProvider) {
-                this->applySyntaxRules(syntaxProvider->getSyntaxRules());
-            } else {
-                qWarning() << "SyntaxProvider is null for extension:" << extension;
-                this->applySyntaxRules({}); // Сбрасываем в пустые правила
-            }
-        } else {
-            qWarning() << "[FileView] NO PROVIDER FOUND for extension:" << extension;
-
-            this->applySyntaxRules({});
+        // Проверяем только наши маркеры ошибок, а не пустоту строки!
+        if (content.startsWith("__ERROR_")) {
+            qDebug() << "[FileView] Failed to load file due to FileManager error.";
+            return false;
         }
+
+        m_filePath = filePath;
+        this->setPlainText(content); // Если content == "", это просто очистит редактор
+
+        // ... дальше твой код с провайдерами и подсветкой ...
 
         this->document()->setModified(false);
         return true;

@@ -1,8 +1,9 @@
 #include "gui/customiconprovider.h"
-
 #include <QInputDialog>
 #include <QMessageBox>
 #include <QFile>
+#include <QDir>
+#include <QDebug>
 
 #include "gui/fileexplorerwidget.h"
 
@@ -35,28 +36,24 @@ namespace gs {
 
         m_fileModel = new QFileSystemModel(this);
         m_fileModel->setReadOnly(false);
-
-        QString currentPath = QDir::currentPath();
         m_fileModel->setIconProvider(new CustomIconProvider());
-        m_fileModel->setRootPath(currentPath);
 
         m_treeView = new QTreeView(this);
         m_treeView->setModel(m_fileModel);
-        m_treeView->setEditTriggers(QAbstractItemView::NoEditTriggers);
-        m_treeView->setRootIndex(m_fileModel->index(currentPath));
-        m_treeView->setHeaderHidden(true);
         m_treeView->setIndentation(TREE_INDENTATION);
+        m_treeView->setAnimated(true);
+        m_treeView->setSortingEnabled(true);
+        m_treeView->setContextMenuPolicy(Qt::CustomContextMenu);
+        m_treeView->setHeaderHidden(true);
 
         for (int i = 1; i < m_fileModel->columnCount(); ++i) {
             m_treeView->hideColumn(i);
         }
 
-        m_treeView->setContextMenuPolicy(Qt::CustomContextMenu);
+        layout->addWidget(m_treeView);
 
         connect(m_treeView, &QTreeView::customContextMenuRequested, this, &FileExplorerWidget::showContextMenu);
         connect(m_treeView, &QTreeView::doubleClicked, this, &FileExplorerWidget::onDoubleClicked);
-
-        layout->addWidget(m_treeView);
     }
 
     void FileExplorerWidget::setRootPath(const QString &path) {
@@ -65,53 +62,71 @@ namespace gs {
     }
 
     void FileExplorerWidget::onDoubleClicked(const QModelIndex &index) {
+        if (!index.isValid()) return;
         QString path = m_fileModel->filePath(index);
-        if (QFileInfo(path).isFile()) {
+
+        if (!path.isEmpty() && QFileInfo(path).isFile()) {
             emit fileSelected(path);
         }
     }
 
     void FileExplorerWidget::showContextMenu(const QPoint &pos) {
         QModelIndex index = m_treeView->indexAt(pos);
-        QMenu contextMenu(this);
+        QMenu menu(this);
 
-        QAction *newFileAction = contextMenu.addAction(ACTION_NEW_FILE_TEXT);
-        QAction *newDirAction = contextMenu.addAction(ACTION_NEW_DIR_TEXT);
-        contextMenu.addSeparator();
+        QAction *newFileAction = menu.addAction(ACTION_NEW_FILE_TEXT);
+        QAction *newDirAction = menu.addAction(ACTION_NEW_DIR_TEXT);
+        menu.addSeparator();
+        QAction *renameAction = menu.addAction(ACTION_RENAME_TEXT);
+        QAction *deleteAction = menu.addAction(ACTION_DELETE_TEXT);
 
-        QAction *renameAction = nullptr;
-        QAction *deleteAction = nullptr;
-
-        if (index.isValid()) {
-            renameAction = contextMenu.addAction(ACTION_RENAME_TEXT);
-            deleteAction = contextMenu.addAction(ACTION_DELETE_TEXT);
-        }
-
-        QAction *selected = contextMenu.exec(m_treeView->viewport()->mapToGlobal(pos));
+        QAction *selected = menu.exec(m_treeView->viewport()->mapToGlobal(pos));
 
         if (!selected) return;
+
+        // Определяем папку, где будем создавать
+        QString targetDirPath;
+        if (index.isValid()) {
+            QString itemPath = m_fileModel->filePath(index);
+            targetDirPath = QFileInfo(itemPath).isDir() ? itemPath : QFileInfo(itemPath).absolutePath();
+        } else {
+            targetDirPath = m_fileModel->rootPath();
+        }
+
+        QDir dir(targetDirPath);
 
         if (selected == newFileAction) {
             bool ok;
             QString name = QInputDialog::getText(this, DIALOG_NEW_FILE_TITLE, DIALOG_NEW_FILE_LABEL, QLineEdit::Normal, "", &ok);
+
             if (ok && !name.isEmpty()) {
-                QString path = m_fileModel->filePath(index.isValid() ? index : m_treeView->rootIndex());
-                QFileInfo info(path);
-                QString dirPath = info.isDir() ? path : info.absolutePath();
-                QFile file(dirPath + "/" + name);
+                QString fullPath = dir.absoluteFilePath(name);
+
+                QFile file(fullPath);
+                // Временно блокируем сигналы дерева, чтобы оно не пыталось само открыть файл пока мы его создаем
+                m_treeView->blockSignals(true);
+
                 if (file.open(QIODevice::WriteOnly)) {
                     file.close();
+
+                    // Даем модели команду обновиться
+                    m_fileModel->fetchMore(m_fileModel->index(targetDirPath));
+
+                    // Эмитим сигнал открытия напрямую
+                    qDebug() << "[Explorer] Success creation, opening:" << fullPath;
+                    emit fileSelected(fullPath);
+                } else {
+                    QMessageBox::critical(this, "Error", "Create failed: " + file.errorString());
                 }
+
+                m_treeView->blockSignals(false);
             }
         }
         else if (selected == newDirAction) {
             bool ok;
             QString name = QInputDialog::getText(this, DIALOG_NEW_DIR_TITLE, DIALOG_NEW_DIR_LABEL, QLineEdit::Normal, "", &ok);
             if (ok && !name.isEmpty()) {
-                QString path = m_fileModel->filePath(index.isValid() ? index : m_treeView->rootIndex());
-                QFileInfo info(path);
-                QString dirPath = info.isDir() ? path : info.absolutePath();
-                QDir().mkdir(dirPath + "/" + name);
+                dir.mkdir(name);
             }
         }
         else if (selected == renameAction && index.isValid()) {

@@ -6,16 +6,25 @@
 #include "core/project/projectmanager.h"
 
 namespace gs {
+    // FileManager.cpp
     QString FileManager::readFile(const QString &filePath) {
         QFile file(filePath);
-        if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-            qDebug() << "CRITICAL: Could not open file for reading:" << filePath;
-            return QString();
+        if (!file.exists()) {
+            qDebug() << "CRITICAL: File does not exist:" << filePath;
+            return "__ERROR_FILE_NOT_FOUND__"; // Специальный маркер ошибки
         }
+
+        if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+            qDebug() << "CRITICAL: Could not open file:" << filePath << "Error:" << file.errorString();
+            return "__ERROR_CANNOT_OPEN__";
+        }
+
         QTextStream in(&file);
         QString content = in.readAll();
+        file.close();
+
         qDebug() << "SUCCESS: Read" << content.length() << "characters from" << filePath;
-        return content;
+        return content; // Для пустого файла вернет "", и это нормально!
     }
 
     bool FileManager::saveFile(const QString &filePath, const QString &content) {

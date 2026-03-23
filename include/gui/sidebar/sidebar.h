@@ -14,6 +14,7 @@ namespace gs {
             void projectToggled(bool checked);
         void terminalToggled(bool checked);
         void runClicked();
+        void exitClicked();
 
     private:
         QToolButton* createButton(const QString& iconPath, const QString& tooltip);

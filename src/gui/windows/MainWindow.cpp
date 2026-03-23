@@ -5,6 +5,7 @@
 #include "core/project/projectmanager.h"
 #include "gui/sidebar/sidebar.h"
 #include "core/languages/java/javalanguageprovider.h"
+#include "gui/windows/startwindow.h"
 
 #include <QFileDialog>
 #include <QMessageBox>
@@ -76,6 +77,8 @@ namespace gs {
 
         Sidebar *sidebar = new Sidebar(upperWidget);
         upperLayout->addWidget(sidebar);
+
+        connect(sidebar, &Sidebar::exitClicked, this, &MainWindow::onCloseProjectClicked);
 
         m_hSplitter = new QSplitter(Qt::Horizontal, upperWidget);
         m_hSplitter->setHandleWidth(SPLITTER_HANDLE_WIDTH);
@@ -239,5 +242,25 @@ namespace gs {
 
         ProjectManager::instance().processFile(currentPath);
         m_terminal->appendOutput("Queued for indexing: " + currentPath + "\n", false);
+    }
+
+    void MainWindow::onCloseProjectClicked() {
+        // 1. Создаем диалог подтверждения
+        QMessageBox msgBox(QMessageBox::Question, "Close Project",
+                           "Are you sure you want to close the project?",
+                           QMessageBox::Yes | QMessageBox::No, this);
+
+        // Применяем наш стиль (без рамок)
+        msgBox.setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
+        // Если ты уже создал dialogutils.h, можно добавить: gs::makeDraggable(&msgBox);
+
+        if (msgBox.exec() == QMessageBox::Yes) {
+            // 2. Создаем стартовое окно
+            StartWindow *startWin = new StartWindow();
+            startWin->show();
+
+            // 3. Закрываем текущее окно
+            this->close();
+        }
     }
 } // namespace gs

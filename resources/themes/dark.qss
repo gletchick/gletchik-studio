@@ -353,3 +353,17 @@ QFileDialog {
     border: 1px solid #3c3c3c;
     background-color: #1e1e1e;
 }
+
+QToolButton#btnCloseProject {
+    background-color: transparent;
+    border: none;
+    margin-bottom: 10px; /* Отступ от нижнего края */
+    width: 37px;
+    height: 38px;
+    color: #858585;
+}
+
+QToolButton#btnCloseProject:hover {
+    background-color: #e81123; /* Красный цвет при наведении (как кнопка закрытия) */
+    color: white;
+}

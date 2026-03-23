@@ -10,5 +10,6 @@
         <file>icons/create-project.svg</file>
         <file>icons/project-from-git.svg</file>
         <file>icons/open-project.svg</file>
+        <file>icons/exit.svg</file>
     </qresource>
 </RCC>

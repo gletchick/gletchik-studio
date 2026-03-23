@@ -36,6 +36,7 @@ namespace gs {
         void onRunClicked();
         void processOutputQueue();
         void onRefreshIndexTriggered();
+        void onCloseProjectClicked();
 
     private:
         Ui::MainWindow *ui;

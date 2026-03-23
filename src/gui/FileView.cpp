@@ -53,9 +53,31 @@ namespace gs {
         }
 
         m_filePath = filePath;
-        this->setPlainText(content); // Если content == "", это просто очистит редактор
 
-        // ... дальше твой код с провайдерами и подсветкой ...
+        QFileInfo fileInfo(filePath);
+        QString extension = "." + fileInfo.suffix();
+
+        this->setPlainText(content);
+
+        auto provider = PluginManager::getProviderByExtension(extension.toStdString());
+
+        if (provider) {
+            qDebug() << "[FileView] Provider found for extension:" << extension
+                 << "Language:" << QString::fromStdString(provider->languageName());
+
+            auto syntaxProvider = provider->getSyntaxProvider();
+
+            if (syntaxProvider) {
+                this->applySyntaxRules(syntaxProvider->getSyntaxRules());
+            } else {
+                qWarning() << "SyntaxProvider is null for extension:" << extension;
+                this->applySyntaxRules({}); // Сбрасываем в пустые правила
+            }
+        } else {
+            qWarning() << "[FileView] NO PROVIDER FOUND for extension:" << extension;
+
+            this->applySyntaxRules({});
+        }
 
         this->document()->setModified(false);
         return true;

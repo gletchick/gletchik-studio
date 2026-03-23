@@ -213,13 +213,23 @@ namespace gs {
     }
 
     void MainWindow::onOpenProjectTriggered() {
-        QString dir = QFileDialog::getExistingDirectory(this, "Select Project", QDir::homePath());
-        if (dir.isEmpty()) return;
+        QFileDialog dialog(this);
+        dialog.setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
 
-        if (ProjectManager::instance().openProject(dir)) {
-            loadProject(dir);
-        } else {
-            QMessageBox::warning(this, "Error", MSG_ERR_NOT_PROJECT);
+        dialog.setWindowTitle("Select Project");
+        dialog.setFileMode(QFileDialog::Directory);
+        dialog.setOption(QFileDialog::DontUseNativeDialog, true); // Обязательно!
+
+        if (dialog.exec()) {
+            QStringList dirs = dialog.selectedFiles();
+            if (!dirs.isEmpty()) {
+                QString dir = dirs.first();
+                if (ProjectManager::instance().openProject(dir)) {
+                    loadProject(dir);
+                } else {
+                    QMessageBox::warning(this, "Error", MSG_ERR_NOT_PROJECT);
+                }
+            }
         }
     }
 

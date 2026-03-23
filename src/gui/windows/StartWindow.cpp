@@ -79,46 +79,52 @@ namespace gs {
         mainLayout->addWidget(bottomBar);
     }
 
-    void StartWindow::createActionButtons(QWidget *container, QLayout *layout) {
+void StartWindow::createActionButtons(QWidget *container, QLayout *layout) {
 
-        // 1. NEW PROJECT
-        layout->addWidget(createLargeButton(":/icons/create-project.svg", "New Project", container, [this]() {
-            QString dir = QFileDialog::getExistingDirectory(this, "Select Directory for New Project",
-                                                             QDir::homePath(),
-                                                             QFileDialog::ShowDirsOnly);
-            if (!dir.isEmpty()) {
-                // Если менеджер успешно создал проект
-                if (ProjectManager::instance().createProject(dir)) {
-                    MainWindow *mainWin = new MainWindow();
-                    mainWin->loadProject(dir);
-                    mainWin->show();
-                    this->close();
-                }
+    // 1. NEW PROJECT
+    layout->addWidget(createLargeButton(":/icons/create-project.svg", "New Project", container, [this]() {
+        QFileDialog dialog(this);
+        dialog.setWindowFlags(Qt::Window | Qt::FramelessWindowHint); // Убираем белую рамку
+        dialog.setWindowTitle("Select Directory for New Project");
+        dialog.setFileMode(QFileDialog::Directory);
+        dialog.setOption(QFileDialog::ShowDirsOnly, true);
+        dialog.setOption(QFileDialog::DontUseNativeDialog, true); // Включаем наш QSS
+
+        if (dialog.exec()) {
+            QString dir = dialog.selectedFiles().first();
+            if (ProjectManager::instance().createProject(dir)) {
+                MainWindow *mainWin = new MainWindow();
+                mainWin->loadProject(dir);
+                mainWin->show();
+                this->close();
             }
-        }));
+        }
+    }));
 
-        // 2. OPEN PROJECT
-        layout->addWidget(createLargeButton(":/icons/open-project.svg", "Open Project", container, [this]() {
-            QString dir = QFileDialog::getExistingDirectory(this, "Open Project",
-                                                             QDir::homePath(),
-                                                             QFileDialog::ShowDirsOnly);
-            if (!dir.isEmpty()) {
-                // Если менеджер успешно нашел и открыл проект
-                if (ProjectManager::instance().openProject(dir)) {
-                    MainWindow *mainWin = new MainWindow();
-                    mainWin->loadProject(dir);
-                    mainWin->show();
-                    this->close();
-                }
+    // 2. OPEN PROJECT
+    layout->addWidget(createLargeButton(":/icons/open-project.svg", "Open Project", container, [this]() {
+        QFileDialog dialog(this);
+        dialog.setWindowFlags(Qt::Window | Qt::FramelessWindowHint); // Убираем белую рамку
+        dialog.setWindowTitle("Open Project");
+        dialog.setFileMode(QFileDialog::Directory);
+        dialog.setOption(QFileDialog::ShowDirsOnly, true);
+        dialog.setOption(QFileDialog::DontUseNativeDialog, true); // Включаем наш QSS
+
+        if (dialog.exec()) {
+            QString dir = dialog.selectedFiles().first();
+            if (ProjectManager::instance().openProject(dir)) {
+                MainWindow *mainWin = new MainWindow();
+                mainWin->loadProject(dir);
+                mainWin->show();
+                this->close();
             }
-        }));
+        }
+    }));
 
-        // Эту кнопку пока не трогаем (как друг и просил)
-        layout->addWidget(createLargeButton(":/icons/project-from-git.svg", "Get from VCS", container, []() {
-            ProjectManager::instance().cloneFromVCS("https://github.com/user/repo.git", "/target/path");
-        }));
-    }
-
+    layout->addWidget(createLargeButton(":/icons/project-from-git.svg", "Get from VCS", container, []() {
+        ProjectManager::instance().cloneFromVCS("https://github.com/user/repo.git", "/target/path");
+    }));
+}
 
     QWidget* StartWindow::createLargeButton(const QString &iconPath, const QString &text, QWidget *parent, std::function<void()> onClick) {
         QWidget *tileContainer = new QWidget(parent);

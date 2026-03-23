@@ -79,75 +79,92 @@ namespace gs {
         }
     }
 
-    void FileExplorerWidget::showContextMenu(const QPoint &pos) {
-        QModelIndex index = m_treeView->indexAt(pos);
-        QMenu menu(this);
+void FileExplorerWidget::showContextMenu(const QPoint &pos) {
+    QModelIndex index = m_treeView->indexAt(pos);
+    QMenu menu(this);
 
-        QAction *newFileAction = menu.addAction(ACTION_NEW_FILE_TEXT);
-        QAction *newDirAction = menu.addAction(ACTION_NEW_DIR_TEXT);
-        menu.addSeparator();
-        QAction *renameAction = menu.addAction(ACTION_RENAME_TEXT);
-        QAction *deleteAction = menu.addAction(ACTION_DELETE_TEXT);
+    QAction *newFileAction = menu.addAction(ACTION_NEW_FILE_TEXT);
+    QAction *newDirAction = menu.addAction(ACTION_NEW_DIR_TEXT);
+    menu.addSeparator();
+    QAction *renameAction = menu.addAction(ACTION_RENAME_TEXT);
+    QAction *deleteAction = menu.addAction(ACTION_DELETE_TEXT);
 
-        QAction *selected = menu.exec(m_treeView->viewport()->mapToGlobal(pos));
+    QAction *selected = menu.exec(m_treeView->viewport()->mapToGlobal(pos));
 
-        if (!selected) return;
+    if (!selected) return;
 
-        // Определяем рабочую папку
-        QString targetPath = m_fileModel->filePath(index.isValid() ? index : m_treeView->rootIndex());
-        if (targetPath.isEmpty()) targetPath = m_fileModel->rootPath();
+    // Определяем рабочую папку
+    QString targetPath = m_fileModel->filePath(index.isValid() ? index : m_treeView->rootIndex());
+    if (targetPath.isEmpty()) targetPath = m_fileModel->rootPath();
 
-        QFileInfo targetInfo(targetPath);
-        QDir dir(targetInfo.isDir() ? targetPath : targetInfo.absolutePath());
+    QFileInfo targetInfo(targetPath);
+    QDir dir(targetInfo.isDir() ? targetPath : targetInfo.absolutePath());
 
-        if (selected == newFileAction) {
-            bool ok;
-            QString name = QInputDialog::getText(this, DIALOG_NEW_FILE_TITLE, DIALOG_NEW_FILE_LABEL, QLineEdit::Normal, "", &ok);
+    if (selected == newFileAction) {
+        // --- ЗАМЕНА СТАТИКИ НА ОБЪЕКТ ДЛЯ ТЕМНОЙ РАМКИ ---
+        QInputDialog dialog(this);
+        dialog.setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
+        dialog.setWindowTitle(DIALOG_NEW_FILE_TITLE);
+        dialog.setLabelText(DIALOG_NEW_FILE_LABEL);
 
-            if (ok && !name.isEmpty()) {
+        if (dialog.exec() == QDialog::Accepted) {
+            QString name = dialog.textValue();
+            if (!name.isEmpty()) {
                 QString fullFilePath = dir.absoluteFilePath(name);
                 QFile file(fullFilePath);
 
-                // Блокируем сигналы, чтобы дерево не перехватило фокус в момент создания
+                // Твоя логика сигналов и создания
                 m_treeView->blockSignals(true);
 
                 if (file.open(QIODevice::ReadWrite | QIODevice::Text)) {
-                    file.write(""); // Гарантируем наличие контента для ОС
+                    file.write("");
                     file.flush();
                     file.close();
 
                     qDebug() << "[Explorer] New file created:" << fullFilePath;
 
-                    // Обновляем модель
                     m_fileModel->fetchMore(m_fileModel->index(dir.absolutePath()));
-
-                    // Сразу шлем сигнал на открытие
                     emit fileSelected(fullFilePath);
                 } else {
-                    QMessageBox::critical(this, "Error", "Can't create file: " + file.errorString());
+                    // Темный MessageBox
+                    QMessageBox mb(QMessageBox::Critical, "Error", "Can't create file: " + file.errorString(), QMessageBox::Ok, this);
+                    mb.setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
+                    mb.exec();
                 }
 
                 m_treeView->blockSignals(false);
             }
         }
-        else if (selected == newDirAction) {
-            bool ok;
-            QString name = QInputDialog::getText(this, DIALOG_NEW_DIR_TITLE, DIALOG_NEW_DIR_LABEL, QLineEdit::Normal, "", &ok);
-            if (ok && !name.isEmpty()) {
+    }
+    else if (selected == newDirAction) {
+        // --- ЗАМЕНА СТАТИКИ НА ОБЪЕКТ ДЛЯ ТЕМНОЙ РАМКИ ---
+        QInputDialog dialog(this);
+        dialog.setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
+        dialog.setWindowTitle(DIALOG_NEW_DIR_TITLE);
+        dialog.setLabelText(DIALOG_NEW_DIR_LABEL);
+
+        if (dialog.exec() == QDialog::Accepted) {
+            QString name = dialog.textValue();
+            if (!name.isEmpty()) {
                 if (!dir.mkdir(name)) {
-                    QMessageBox::critical(this, "Error", "Could not create directory");
+                    QMessageBox mb(QMessageBox::Critical, "Error", "Could not create directory", QMessageBox::Ok, this);
+                    mb.setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
+                    mb.exec();
                 }
             }
         }
-        else if (selected == renameAction && index.isValid()) {
-            // Переименование разрешено только через контекстное меню
-            m_treeView->edit(index);
-        }
-        else if (selected == deleteAction && index.isValid()) {
-            if (QMessageBox::question(this, DIALOG_DELETE_TITLE, DIALOG_DELETE_TEXT) == QMessageBox::Yes) {
-                m_fileModel->remove(index);
-            }
+    }
+    else if (selected == renameAction && index.isValid()) {
+        m_treeView->edit(index);
+    }
+    else if (selected == deleteAction && index.isValid()) {
+        // Темный вопрос об удалении
+        QMessageBox mb(QMessageBox::Question, DIALOG_DELETE_TITLE, DIALOG_DELETE_TEXT, QMessageBox::Yes | QMessageBox::No, this);
+        mb.setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
+        if (mb.exec() == QMessageBox::Yes) {
+            m_fileModel->remove(index);
         }
     }
+}
 
 } // namespace gs

@@ -6,17 +6,20 @@ QWidget#MainWindow {
 
 /* ================= Верхняя панель (Title Bar) ================= */
 QWidget#titleBarWidget {
-    background-color: #252526; /* Сделал чуть темнее для солидности */
+    background-color: #252526; /* Тот самый солидный серый */
     border-bottom: 1px solid #1a1a1a;
+    min-height: 35px;
+    max-height: 35px;
 }
 
 QLabel#titleLabel {
-    color: #858585; /* Приглушенный серый */
+    color: #858585;
     font-size: 10px;
     font-weight: bold;
     text-transform: uppercase;
     letter-spacing: 2px;
     padding-left: 12px;
+    background-color: transparent; /* Чтобы не перекрывал фон панели */
 }
 
 /* Компактные кнопки управления окном */
@@ -24,14 +27,13 @@ QPushButton#btnMinimize, QPushButton#btnMaximize, QPushButton#btnClose {
     background-color: transparent;
     color: #969696;
     border: none;
-    width: 32px;  /* Уменьшили ширину */
-    height: 35px;
-    font-size: 11px;
+    width: 45px; /* Стандартная ширина для удобства */
+    height: 35px; /* Высота должна совпадать с высотой всей панели */
+    font-size: 14px; /* Чтобы иконки/символы были разборчивы */
 }
 
 QPushButton#btnMinimize:hover, QPushButton#btnMaximize:hover {
     background-color: rgba(255, 255, 255, 0.1);
-    color: #ffffff;
 }
 
 QPushButton#btnClose:hover {
@@ -139,33 +141,85 @@ QMenu::separator {
 }
 
 /* ================= Диалоги (Тёмная тема) ================= */
-QDialog, QMessageBox, QInputDialog {
+/* Эта рамка заменит системную белую полосу */
+QDialog, QFileDialog, QMessageBox, QInputDialog {
+    border: 1px solid #3c3c3c;
     background-color: #1e1e1e;
-    color: #cccccc;
 }
 
-QLineEdit {
+/* Глобальная тёмная окантовка для всех окон и диалогов */
+QMainWindow, QDialog, QFileDialog, QMessageBox, gs--BaseWindow {
+    border: 1px solid #3c3c3c;
+    background-color: #1e1e1e;
+}
+
+/* Убираем возможные внутренние отступы, чтобы рамка прилегала плотно */
+QDialog {
+    margin: 0px;
+}
+
+/* Главный фон и принудительный светлый текст для всех надписей */
+QFileDialog, QDialog, QMessageBox, QInputDialog, QLabel {
+    background-color: #1e1e1e;
+    color: #dfe1e5;
+}
+
+/* Окно создания файла (New File): делаем текст и фон корректными */
+QDialog QLabel {
+    color: #dfe1e5;
+    background-color: transparent;
+}
+
+/* Список файлов и папок: убираем белый контур и красим текст */
+QFileDialog QAbstractItemView {
+    background-color: #2b2d30;
+    color: #dfe1e5;
+    border: 1px solid #1a1a1a;
+    selection-background-color: #2e436e;
+    outline: none;
+}
+
+/* Шапка таблицы (Name, Size): убираем белые полосы */
+QFileDialog QHeaderView::section {
+    background-color: #3c3f41;
+    color: #dfe1e5;
+    padding: 4px;
+    border: 1px solid #1a1a1a;
+}
+
+/* Боковая панель (Quick Access) */
+QFileDialog QWidget#sidebar {
+    background-color: #181818;
+    border-right: 1px solid #1a1a1a;
+}
+
+/* Поля ввода и выпадающие списки */
+QLineEdit, QComboBox {
     background-color: #2d2d2d;
     color: #ffffff;
     border: 1px solid #3c3c3c;
     padding: 4px;
-    border-radius: 2px;
 }
 
-QLineEdit:focus {
-    border: 1px solid #007acc; /* Синяя рамка при вводе */
-}
-
-QPushButton {
-    background-color: #333333;
-    color: #ffffff;
-    border: 1px solid #454545;
+/* Единый стиль для всех кнопок в диалогах (OK, Cancel, Choose) */
+QFileDialog QPushButton, QDialog QPushButton, QMessageBox QPushButton {
+    background-color: #353739;
+    color: #dfe1e5;
+    border: 1px solid #4b4d4d;
     padding: 5px 15px;
-    border-radius: 2px;
+    border-radius: 3px;
 }
 
-QPushButton:hover {
-    background-color: #444444;
+QFileDialog QPushButton:hover, QDialog QPushButton:hover, QMessageBox QPushButton:hover {
+    background-color: #4b4d4d;
+    border: 1px solid #5a5c5c;
+}
+
+/* Кнопки-иконки вверху проводника (Назад, Вверх) */
+QFileDialog QToolButton {
+    background-color: transparent;
+    border: none;
+    color: #dfe1e5;
 }
 
 /* ================= Редактор и Терминал ================= */
@@ -295,10 +349,7 @@ QPushButton#btnSettings:hover {
     background-color: #3c3c3c;
 }
 
-QPushButton#btnSettings:pressed {
-    /* При нажатии чуть затемняем, создавая эффект глубины */
-    background-color: #2d2d2d;
+QFileDialog {
+    border: 1px solid #3c3c3c;
+    background-color: #1e1e1e;
 }
-
-/* Если иконка кажется слишком тусклой, можно добавить стиль для неё (через QIcon)
-   Но обычно достаточно того, что фон под ней меняется */

@@ -5,7 +5,9 @@
 #include <QReadWriteLock>
 #include <QMutex>
 #include <QSet>
+#include <memory>
 
+#include "core/project/indexworker.h"
 #include "core/syntaxanaliz/projectindex.h"
 #include "sdk/syntaxrules.h"
 
@@ -30,12 +32,17 @@ namespace gs {
         TokenType getSemanticType(const QString &identifier) const;
 
         void processFile(const QString &filePath);
+        void processFileInternal(const QString &filePath);
+
+        IndexWorker* getWorker() const { return m_worker.get(); }
 
     private:
-        ProjectManager() = default;
+        ProjectManager();
         ~ProjectManager() = default;
 
         void rebuildSemanticCache();
+
+        std::unique_ptr<IndexWorker> m_worker;
 
         QString m_projectPath;
         ProjectIndex m_projectIndex;
@@ -50,4 +57,4 @@ namespace gs {
         const QString indexFileName = "project_index.json";
     };
 
-}
+} // namespace gs

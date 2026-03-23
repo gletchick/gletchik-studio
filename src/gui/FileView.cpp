@@ -90,6 +90,12 @@ namespace gs {
         return success;
     }
 
+    void FileView::rehighlight() {
+        if (m_highlighter) {
+            m_highlighter->rehighlight();
+        }
+    }
+
     void FileView::applySyntaxRules(const std::vector<HighlightRule>& rules) {
         if (m_highlighter) {
             m_highlighter->setRules(rules);

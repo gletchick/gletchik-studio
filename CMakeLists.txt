@@ -68,6 +68,8 @@ set(CORE_SOURCES
         src/core/languages/java/JavaSyntaxProvider.cpp
         include/core/syntaxanaliz/projectindex.h
         src/core/syntaxanaliz/projectindex.cpp
+        include/core/project/indexworker.h
+        src/core/project/IndexWorker.cpp
 )
 
 add_executable(gletchik-studio

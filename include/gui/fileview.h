@@ -15,10 +15,9 @@ namespace gs {
         explicit FileView(QWidget *parent = nullptr);
 
         bool loadFile(const QString &filePath);
-
         void applySyntaxRules(const std::vector<HighlightRule>& rules);
-
         bool saveCurrentFile();
+        void rehighlight();
 
         QString currentFilePath() const { return m_filePath; }
 

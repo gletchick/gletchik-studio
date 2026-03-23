@@ -14,6 +14,7 @@
 #include <QFileInfo>
 #include <QMetaObject>
 #include <thread>
+#include <QShortcut>
 
 #include "core/languages/java/javabuildbontroller.h"
 #include "gui/terminalwidget.h"
@@ -127,11 +128,25 @@ namespace gs {
 
         m_updateTimer = new QTimer(this);
         connect(m_updateTimer, &QTimer::timeout, this, &MainWindow::processOutputQueue);
-        m_updateTimer->start(50); // Проверяем очередь каждые 50 мс
+        m_updateTimer->start(50);
+
+        QShortcut *refreshShortcut = new QShortcut(QKeySequence("Ctrl+R"), this);
+        connect(refreshShortcut, &QShortcut::activated, this, &MainWindow::onRefreshIndexTriggered);
+
+        if (auto worker = ProjectManager::instance().getWorker()) {
+            connect(worker, &IndexWorker::fileIndexed, this, [this](const QString& path) {
+                if (m_editor->currentFilePath() == path) {
+                    m_editor->rehighlight();
+                }
+            });
+
+            connect(worker, &IndexWorker::indexingFinished, this, [this]() {
+                m_terminal->appendOutput("Background indexing finished.\n", false);
+            });
+        }
     }
 
     void MainWindow::onTerminalInput(const QString& text) {
-        // Исправлено: m_controller -> m_buildController
         if (m_buildController) {
             m_buildController->writeInput(text.toStdString());
         }
@@ -208,4 +223,11 @@ namespace gs {
         }
     }
 
+    void MainWindow::onRefreshIndexTriggered() {
+        QString currentPath = m_editor->currentFilePath();
+        if (currentPath.isEmpty()) return;
+
+        ProjectManager::instance().processFile(currentPath);
+        m_terminal->appendOutput("Queued for indexing: " + currentPath + "\n", false);
+    }
 } // namespace gs

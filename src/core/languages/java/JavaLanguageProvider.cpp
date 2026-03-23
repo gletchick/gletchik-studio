@@ -11,11 +11,8 @@ namespace {
     const QString K_CLASSES = "classes";
     const QString K_METHODS = "methods";
 
-    // Паттерн для классов, интерфейсов, перечней и рекордов
     const QString CLASS_PATTERN = "\\b(?:class|interface|enum|record)\\s+([A-Za-z_][A-Za-z0-9_]*)";
 
-    // Упрощенный паттерн для методов: ищем сигнатуру (модификатор + тип + имя + скобка)
-    // Группа 1 захватывает именно имя метода
     const QString METHOD_PATTERN = "(?:public|protected|private|static|\\s) +[\\w\\<\\>\\[\\]\\, ]+\\s+([A-Za-z_][A-Za-z0-9_]*)\\s*\\(";
 }
 

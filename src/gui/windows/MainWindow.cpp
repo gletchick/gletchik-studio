@@ -199,7 +199,6 @@ namespace gs {
     }
 
     void MainWindow::processOutputQueue() {
-        // Выгребаем всё из очереди за один тик таймера
         while (auto msg = m_outputQueue.tryPop()) {
             QString text = QString::fromStdString(*msg);
             bool isError = text.startsWith("E:");
@@ -245,21 +244,16 @@ namespace gs {
     }
 
     void MainWindow::onCloseProjectClicked() {
-        // 1. Создаем диалог подтверждения
         QMessageBox msgBox(QMessageBox::Question, "Close Project",
                            "Are you sure you want to close the project?",
                            QMessageBox::Yes | QMessageBox::No, this);
 
-        // Применяем наш стиль (без рамок)
         msgBox.setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
-        // Если ты уже создал dialogutils.h, можно добавить: gs::makeDraggable(&msgBox);
 
         if (msgBox.exec() == QMessageBox::Yes) {
-            // 2. Создаем стартовое окно
             StartWindow *startWin = new StartWindow();
             startWin->show();
 
-            // 3. Закрываем текущее окно
             this->close();
         }
     }

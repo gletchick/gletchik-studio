@@ -25,16 +25,15 @@ namespace gs {
         TokenType type;
     };
 
-    class WordAnalyzier {
+    class WordAnalyzer {
     public:
-        WordAnalyzier(const std::vector<HighlightRule>& rules);
-        // Добавим явный деструктор для отладки, если падение повторится
-        ~WordAnalyzier() = default;
+        WordAnalyzer(const std::vector<HighlightRule>& rules);
+        ~WordAnalyzer() = default;
 
-        std::vector<Token> analyzeLine(const QString& text);
+        std::vector<Token> analyzeLine(const QString& text) const;
 
     private:
-        bool isStaticKeyword(const QString& word, TokenType& outType);
+        bool isStaticKeyword(const QString& word, TokenType& outType) const;
 
         QHash<QString, TokenType> m_staticKeywords;
         std::vector<CompiledRule> m_compiledRules;

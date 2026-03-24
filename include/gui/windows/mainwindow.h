@@ -30,12 +30,12 @@ namespace gs {
         void setupWorkspace(QWidget *contentWidget) override;
 
     private slots:
-        void onProjectToggled(bool checked);
-        void onTerminalToggled(bool checked);
+        void onProjectToggled(bool checked) const;
+        void onTerminalToggled(bool checked) const;
         void onOpenProjectTriggered();
         void onRunClicked();
         void processOutputQueue();
-        void onRefreshIndexTriggered();
+        void onRefreshIndexTriggered() const;
         void onCloseProjectClicked();
 
     private:
@@ -53,7 +53,7 @@ namespace gs {
         ThreadSafeQueue m_outputQueue;
         QTimer *m_updateTimer;
 
-        void onTerminalInput(const QString& text);
+        void onTerminalInput(const QString& text) const;
     };
 
 } // namespace gs

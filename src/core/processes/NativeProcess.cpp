@@ -5,11 +5,12 @@
 #include <iostream>
 #include <ostream>
 #include <vector>
+#include <poll.h>
 
 namespace gs {
 
     NativeProcess::~NativeProcess() {
-        kill();
+        NativeProcess::kill();
     }
 
     bool NativeProcess::start(const std::string& command, const std::vector<std::string>& args) {
@@ -19,7 +20,6 @@ namespace gs {
 
         if (m_isRunning) return false;
 
-        // Создаем 3 пайпа: stdout, stderr и теперь stdin
         if (pipe(m_stdoutPipe) == -1 || pipe(m_stderrPipe) == -1 || pipe(m_stdinPipe) == -1) {
             return false;
         }
@@ -28,19 +28,15 @@ namespace gs {
         if (m_pid < 0) return false;
 
         if (m_pid == 0) { // Дочерний процесс
-            // Настраиваем stdin: читаем из пайпа
             dup2(m_stdinPipe[0], STDIN_FILENO);
 
-            // Настраиваем stdout/stderr: пишем в пайпы
             dup2(m_stdoutPipe[1], STDOUT_FILENO);
             dup2(m_stderrPipe[1], STDERR_FILENO);
 
-            // Закрываем все ненужные дескрипторы в дочернем процессе
             close(m_stdinPipe[0]); close(m_stdinPipe[1]);
             close(m_stdoutPipe[0]); close(m_stdoutPipe[1]);
             close(m_stderrPipe[0]); close(m_stderrPipe[1]);
 
-            // ... далее твой код с execvp ...
             std::vector<char*> c_args;
             c_args.push_back(const_cast<char*>(command.c_str()));
             for (const auto& arg : args) {
@@ -78,12 +74,12 @@ namespace gs {
         if (result == 0) return true; // Все еще работает
 
         if (WIFEXITED(status)) {
-            const_cast<NativeProcess*>(this)->m_exitCode = WEXITSTATUS(status);
+            this->m_exitCode = WEXITSTATUS(status);
         } else {
-            const_cast<NativeProcess*>(this)->m_exitCode = -1;
+            this->m_exitCode = -1;
         }
 
-        const_cast<NativeProcess*>(this)->m_isRunning = false;
+        this->m_isRunning = false;
         return false;
     }
 
@@ -95,14 +91,11 @@ namespace gs {
         return readFromPipe(m_stderrPipe[0]);
     }
 
-#include <poll.h>
-
     std::string NativeProcess::readFromPipe(int fd) {
-        struct pollfd pfd;
+        pollfd pfd{};
         pfd.fd = fd;
         pfd.events = POLLIN;
 
-        // Проверяем, есть ли данные, не блокируя поток надолго
         int ret = poll(&pfd, 1, 0);
         if (ret <= 0) return "";
 

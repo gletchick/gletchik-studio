@@ -6,7 +6,7 @@ namespace {
     const char* const STRING_PATTERN = "\".*\"";
     const char* const COMMENT_SINGLE_PATTERN = "//[^\n]*";
     const char* const COMMENT_MULTI_PATTERN = "/\\*.*\\*/";
-    const char* const NUMBER_PATTERN = "\\b\\d+(\\.\\d+)?\\b";
+    const char* const NUMBER_PATTERN = R"(\b\d+(\.\d+)?\b)";
     const char* const IDENTIFIER_PATTERN = "\\b[A-Za-z_][A-Za-z0-9_]*\\b";
 }
 

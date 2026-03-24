@@ -10,7 +10,7 @@
 
 namespace gs {
 
-    class WordAnalyzier;
+    class WordAnalyzer;
 
     class SyntaxHighlighter : public QSyntaxHighlighter {
         Q_OBJECT
@@ -27,7 +27,7 @@ namespace gs {
     private:
         void setupFormats();
 
-        std::shared_ptr<WordAnalyzier> m_analyzer;
+        std::shared_ptr<WordAnalyzer> m_analyzer;
         QHash<TokenType, QTextCharFormat> m_formats;
     };
 

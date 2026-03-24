@@ -12,12 +12,10 @@
 
 namespace gs {
 
-    // Инициализируем воркер в конструкторе, чтобы он создался ровно один раз
     ProjectManager::ProjectManager() {
         m_worker = std::make_unique<IndexWorker>();
     }
 
-    // Синглтон возвращаем без пересоздания воркера
     ProjectManager& ProjectManager::instance() {
         static ProjectManager inst;
         return inst;

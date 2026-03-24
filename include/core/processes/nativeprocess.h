@@ -20,7 +20,7 @@ namespace gs {
 
         std::string readAllStdout() override;
         std::string readAllStderr() override;
-        bool writeToStdin(const std::string& input);
+        bool writeToStdin(const std::string& input) override;
 
         int getExitCode() const override { return m_exitCode; }
 

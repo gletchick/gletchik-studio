@@ -149,7 +149,7 @@ namespace gs {
         }
     }
 
-    void MainWindow::onTerminalInput(const QString& text) {
+    void MainWindow::onTerminalInput(const QString& text) const {
         if (m_buildController) {
             m_buildController->writeInput(text.toStdString());
         }
@@ -182,14 +182,12 @@ namespace gs {
         const std::string projPath = QFileInfo(currentFilePath).absolutePath().toStdString();
         const std::string sourceFile = currentFilePath.toStdString();
 
-        // Запускаем через поток и очередь (как в твоем "рабочем" примере)
         std::thread([this, projPath, sourceFile]() {
             m_buildController->runProject(
                 projPath,
                 sourceFile,
                 StepType::Run,
                 [this](const std::string& text, bool isError) {
-                    // Маркируем поток вывода
                     std::string prefix = isError ? "E:" : "O:";
                     m_outputQueue.push(prefix + text);
                 }
@@ -206,11 +204,11 @@ namespace gs {
         }
     }
 
-    void MainWindow::onProjectToggled(bool checked) {
+    void MainWindow::onProjectToggled(bool checked) const {
         if (m_fileExplorer) m_fileExplorer->setVisible(checked);
     }
 
-    void MainWindow::onTerminalToggled(bool checked) {
+    void MainWindow::onTerminalToggled(bool checked) const {
         if (m_terminal) m_terminal->setVisible(checked);
     }
 
@@ -220,8 +218,7 @@ namespace gs {
 
         dialog.setWindowTitle("Select Project");
         dialog.setFileMode(QFileDialog::Directory);
-        dialog.setOption(QFileDialog::DontUseNativeDialog, true); // Обязательно!
-
+        dialog.setOption(QFileDialog::DontUseNativeDialog, true);
         if (dialog.exec()) {
             QStringList dirs = dialog.selectedFiles();
             if (!dirs.isEmpty()) {
@@ -235,7 +232,7 @@ namespace gs {
         }
     }
 
-    void MainWindow::onRefreshIndexTriggered() {
+    void MainWindow::onRefreshIndexTriggered() const {
         QString currentPath = m_editor->currentFilePath();
         if (currentPath.isEmpty()) return;
 
@@ -257,4 +254,5 @@ namespace gs {
             this->close();
         }
     }
+
 } // namespace gs

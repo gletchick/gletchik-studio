@@ -19,14 +19,14 @@ namespace gs {
 
     void IndexWorker::enqueueFile(const QString& filePath) {
         {
-            std::lock_guard<std::mutex> lock(m_queueMutex);
+            std::lock_guard lock(m_queueMutex);
             m_taskQueue.push(filePath);
         }
         m_condition.notify_one();
     }
 
     void IndexWorker::clearQueue() {
-        std::lock_guard<std::mutex> lock(m_queueMutex);
+        std::lock_guard lock(m_queueMutex);
         std::queue<QString> empty;
         std::swap(m_taskQueue, empty);
     }
@@ -36,7 +36,7 @@ namespace gs {
             QString currentFilePath;
 
             {
-                std::unique_lock<std::mutex> lock(m_queueMutex);
+                std::unique_lock lock(m_queueMutex);
                 m_condition.wait(lock, [this]() {
                     return !m_taskQueue.empty() || !m_isRunning;
                 });
@@ -56,7 +56,7 @@ namespace gs {
 
             bool empty = false;
             {
-                std::lock_guard<std::mutex> lock(m_queueMutex);
+                std::lock_guard lock(m_queueMutex);
                 empty = m_taskQueue.empty();
             }
 

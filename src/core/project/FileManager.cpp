@@ -1,17 +1,15 @@
 #include <filesystem>
 #include <QFile>
-#include <QDebug>
 
 #include "core/project/filemanager.h"
 #include "core/project/projectmanager.h"
 
 namespace gs {
-    // FileManager.cpp
     QString FileManager::readFile(const QString &filePath) {
         QFile file(filePath);
         if (!file.exists()) {
             qDebug() << "CRITICAL: File does not exist:" << filePath;
-            return "__ERROR_FILE_NOT_FOUND__"; // Специальный маркер ошибки
+            return "__ERROR_FILE_NOT_FOUND__";
         }
 
         if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -24,7 +22,7 @@ namespace gs {
         file.close();
 
         qDebug() << "SUCCESS: Read" << content.length() << "characters from" << filePath;
-        return content; // Для пустого файла вернет "", и это нормально!
+        return content;
     }
 
     bool FileManager::saveFile(const QString &filePath, const QString &content) {

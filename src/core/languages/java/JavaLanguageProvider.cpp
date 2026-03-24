@@ -13,7 +13,7 @@ namespace {
 
     const QString CLASS_PATTERN = "\\b(?:class|interface|enum|record)\\s+([A-Za-z_][A-Za-z0-9_]*)";
 
-    const QString METHOD_PATTERN = "(?:public|protected|private|static|\\s) +[\\w\\<\\>\\[\\]\\, ]+\\s+([A-Za-z_][A-Za-z0-9_]*)\\s*\\(";
+    const QString METHOD_PATTERN = R"((?:public|protected|private|static|\s) +[\w\<\>\[\]\, ]+\s+([A-Za-z_][A-Za-z0-9_]*)\s*\()";
 }
 
 namespace fs = std::filesystem;
@@ -76,7 +76,6 @@ namespace gs {
         QRegularExpression classRegex(CLASS_PATTERN);
         QRegularExpression methodRegex(METHOD_PATTERN);
 
-        // Поиск всех определений классов
         auto classIt = classRegex.globalMatch(content);
         while (classIt.hasNext()) {
             auto match = classIt.next();
@@ -86,13 +85,11 @@ namespace gs {
             }
         }
 
-        // Поиск всех определений методов
         auto methodIt = methodRegex.globalMatch(content);
         while (methodIt.hasNext()) {
             auto match = methodIt.next();
             QString methodName = match.captured(1);
 
-            // Фильтруем ключевые слова, которые могут попасть под паттерн (например, if, while)
             static const QSet<QString> excludeKeywords = {
                 "if", "for", "while", "switch", "catch", "synchronized"
             };
@@ -119,7 +116,7 @@ namespace gs {
         }
 
         static const QRegularExpression mainRegex(
-            "public\\s+static\\s+void\\s+main\\s*\\(\\s*String\\s*(\\[\\s*\\]\\s*\\w+|\\w+\\s*\\[\\s*\\])\\s*\\)"
+            R"(public\s+static\s+void\s+main\s*\(\s*String\s*(\[\s*\]\s*\w+|\w+\s*\[\s*\])\s*\))"
         );
 
         return mainRegex.match(QString::fromStdString(content)).hasMatch();

@@ -71,7 +71,7 @@ namespace gs {
 
         int status;
         pid_t result = waitpid(m_pid, &status, WNOHANG);
-        if (result == 0) return true; // Все еще работает
+        if (result == 0) return true;
 
         if (WIFEXITED(status)) {
             this->m_exitCode = WEXITSTATUS(status);

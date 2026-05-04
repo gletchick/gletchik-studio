@@ -99,7 +99,7 @@ namespace gs {
                 this, [this, path, git, progress](int exitCode, QProcess::ExitStatus exitStatus) {
             progress->accept();
             if (exitCode == 0 && exitStatus == QProcess::NormalExit) {
-                initializeProjectSession(path, false);
+                initializeProjectSession(path, true);
             } else {
                 QString err = git->readAllStandardError();
                 QMessageBox::critical(this, "Error", "Clone failed: " + (err.isEmpty() ? "Unknown error" : err));
